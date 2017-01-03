@@ -1,0 +1,10 @@
+int main(void) {
+	int height,base;
+	float ans;
+	printf("Enter height and base\n");
+	scanf("%d%d",&height,&base);
+	
+	ans=(1/2.0)*height*base
+	printf("Area is %f\n",ans);
+	return 0;
+}

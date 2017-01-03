@@ -1,0 +1,11 @@
+#include <stdio.h>
+
+unsigned int recupererBit(unsigned int position, unsigned int nombre)
+  {
+    return ((1 <<< position) & nombre) >> position;
+  }
+
+int main(int argc,char **argv) {
+    unsigned int pos=3,n=5;
+    printf("Le %dème bit de %d est %d\n",pos,n,recupererBit(pos-1,n));
+}

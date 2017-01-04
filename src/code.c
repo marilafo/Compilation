@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 #include "identificateur.h"
 
 //Struct pour la génération de code
@@ -8,7 +9,10 @@ struct generation{
   char *code;
   enum type t;
   char *name;
+  char *last_id;
 };
+
+char *err;
   
 //Niveau pour les déclarations de variables
 int level;
@@ -19,6 +23,9 @@ int num_var = 0;
 //Compteurs de label
 int num_label = 0;
 
+enum type last_type;
+
+int max_hash = 10;
 enum operation_code{
   ADD_OP = 0,
   SUB_OP = 1,
@@ -38,14 +45,8 @@ enum operation_code{
   NE_COMP = 15
 };
 
+GHashTable ** hash_array;
 
-//Table de hash
-int length_hash = 1000;
-int current_length = 0;
-//char *tab[length_hash];
-
-ENTRY e, *ep;
-    
 struct expression *tmp;
 
 //Function to create a new var with a correct name
@@ -56,23 +57,23 @@ char *new_var(){
   return s;
 }
 
+char *new_func(char *function){
+  char *s;
+  asprintf(&s, "@%s_func", function);
+  return s;
+}
+
+char *new_param(char *name){
+  char *s;
+  asprintf(&s,"%s_param", name);
+  return ret;
+}
+
 char *new_label(){
   char *s;
   asprintf(&s,"l%d", num_label);
   num_label++;
   return s;
-}
-
-char *key_name(char *name, int level){
-  char *ret;
-  asprintf(&ret,"%s%d",name,level);
-  return ret;
-}
-
-char *function_name(char *s){
-  char *ret;
-  asprintf(&ret,"%s%s",s,"_function");
-  return ret;
 }
 
 char *get_type(char *name, enum type t){
@@ -273,64 +274,34 @@ char *made_comparison_double(char *res, char *arg1, char *arg2, enum operation_c
   return ret;
 }
 
-int is_in_hash_table(char *name){
-  e.key = name;
-  ep = hsearch(e, FIND);
-  if(!ep)
-    return 0;
-  return 1;
-}
-
-void add_hash_table(struct expression *var){
-  char *key;
-  if(var->size_param != -1)
-    key = key_name(function_name(var->name), var->level);
-  else
-    key = key_name(var->name, var->level);
-  if(is_in_hash_table(key))
-    printf("Error : élément déja dans la table\n");
-  printf("On add %s\n", key);
-  var->val = new_label();
-  e.key = key;
-  e.data = var;
-  ep = hsearch(e, ENTER);
-  if(ep == NULL){
-    printf("Error entré dans la table\n");
-  }
-  else
-    current_length++;
-}
 
 
 
-void get_hash_table(struct expression *var, char *name){
-  printf("On cherche %s\n", key_name(name,level));
-  e.key = key_name(name, level);
-  ep = hsearch(e, FIND);
-  if(!ep){
-    printf("Ce n'est pas dans la table de hash\n");
-  }
-  var = (struct expression *)ep->data;
-}
-
-
-
-    
 struct generation *op_1(char *name, enum operation_code op ){
   struct generation *ret = malloc (sizeof(struct generation));
-  get_hash_table(tmp, name);
+  tmp = action_identifier(name);
   ret->name = tmp->val;    
   ret->t = tmp->t;
-  //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));       
+  ret->last_id = name;
+  //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));
+  }
   switch(tmp->t){
   case INTEGER:
     asprintf(&(ret->code),"%s", made_op_int(ret->name, ret->name, "1", op));    
     break;
   case FLOATING:
     asprintf(&(ret->code),"%s", made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op));
+    
     break;
-  default:
-    printf("Error\n");
+  case VOID_T:
+    printf("++/-- invalide avec type void\n");
+    break;
+  case BOOL_T:
+    printf("++/-- invalide avec type booleen\n");
+    break;
+  case NOT_DEFINE:
+    printf("++/-- invalide variable non défini\n");
+    break;
   }
   //asprintf(&(ret->code),"%s",store_value(ret->name, tmp->val, tmp->t));
   return ret;
@@ -418,21 +389,21 @@ char *return_expression(enum type t, char* var){
 }
 
 enum operation_code string_to_op_code(char *s){
-  if(strcmp("ass", s))
+  if(strcmp("ass", s) == 0)
     return ASS_OP;
-  else if (strcmp("mul", s))
+  else if (strcmp("mul", s) == 0)
     return MUL_OP;
-  else if (strcmp("div", s))
+  else if (strcmp("div", s) == 0)
     return DIV_OP;
-  else if (strcmp("rem", s))
+  else if (strcmp("rem", s) == 0)
     return REM_OP;
-  else if (strcmp("shl", s))
+  else if (strcmp("shl", s) == 0)
     return SHL_OP;
-  else if (strcmp("shr", s))
+  else if (strcmp("shr", s) == 0)
     return SHR_OP;
-  else if (strcmp("add", s))
+  else if (strcmp("add", s) == 0)
     return ADD_OP;
-  else if (strcmp("sub", s))
+  else if (strcmp("sub", s) == 0)
     return SUB_OP;
   return -1;
 }
@@ -497,8 +468,45 @@ char *parameter_to_string(struct expression *e){
   return ret;
 }
 
-void add_type_elt(char *name, enum type t){
-  int i = 0;
-  for(; i < current_length ; ++i)
-    get_hash_table(tmp, );
+
+enum type define_type(char *name){
+  enum type t = NOT_DEFINE;
+  struct expression * old;
+  int i = level;
+  for(; i > 0; --i){
+    if( g_hash_table_contains(hash_array[i], name)){
+      old = g_hash_table_lookup(hash_array[i], name);
+      t = old->t; 
+    }
+  }
+  if(t == NOT_DEFINE)
+      t = last_type;
+  return t;
+}
+
+struct expression * action_identifier(char *name){
+  struct expression *ret
+  if(g_hash_table_contains(hash_array[level], name)){
+    ret = g_hash_table_lookup(hash_array[level], name);
+    //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
+  }
+  else{
+    ret = create_exp(name, new_val(),  define_type(name), -1);
+    g_hash_table_insert(hash_array[level], name, ret);
+  }
+  return ret;
+
+}
+
+struct expression *map_symbol(char *name, enum type t){
+  struct expression *old;
+  int i = level;
+  for(; i > 0; --i){
+    if( g_hash_table_contains(hash_array[i], name)){
+      old = g_hash_table_lookup(hash_array[i], name);
+      if(old->t == t)
+	return old;
+    }
+  }
+  return NULL;
 }

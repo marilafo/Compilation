@@ -6,18 +6,19 @@ struct expression* create_non_init_exp(char *name){
   return e;
 }
 
-struct expression* create_exp(char *name, char *val, enum type t){
+struct expression* create_exp(char *name,char *val, enum type t, int level){
   struct expression *e = malloc(sizeof(struct expression));
   e->name = name;
-  init_exp(e,0,t);
+  init_exp(e,val,t,level);
   return e;
 }
 
-void init_exp(struct expression *e, char *val, enum type t){
+void init_exp(struct expression *e, char *val, enum type t, int level){
   e->t = t;
   e->val = val;
   e->param = NULL;
   e-> size_param = -1;
+  e->level = level;
 }
 
 void init_function(struct expression *e, enum type t, char *val, struct llist *l){

@@ -1,22 +1,21 @@
 %{
-    #define _GNU_SOURCE
-    #include <stdio.h>
-    #include <search.h>
-    #include "identificateur.h"
-    #include "double_to_hex.c"
-    #include "code.c"
+#define _GNU_SOURCE
+#include <stdio.h>
+#include "identificateur.h"
+#include "double_to_hex.c"
+#include "code.c"
   
   
   //A enlever quand on aura les listes
   //int tab = 0;
   //int p = 0;
   
-    extern int yylineno;
-    int yylex ();
-    int yyerror ();
+  extern int yylineno;
+  int yylex ();
+  int yyerror ();
 
     
-%}
+  %}
 
 %token <string> IDENTIFIER
 %token <n> CONSTANTI
@@ -89,54 +88,43 @@ shift_expression
 //DOING
 primary_expression
 : IDENTIFIER {
-  $$ = malloc(sizeof(struct generation));
-  if(is_in_hash_table(key_name($1,level))){
-      $$->name = tmp->val;
-      get_hash_table(tmp, $1);
-      $$->t = tmp->t;
-      //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
-    }
-    else{
-      $$->name = new_var();
-      $$->t = NOT_DEFINE;
-      tmp = create_non_init_exp($1);
-      tmp->val = $$->name;
-      tmp->t = NOT_DEFINE;
-      tmp->size_param = -1;
-      add_hash_table(tmp);
-    }
-    asprintf(&($$->code), "%s", $$->name);
-    printf("%s", $$->name);
+  tmp = action_identifier($1);
+  $$->name = tmp->val;
+  $$->t = tmp->t;
+  $$->code = NULL;
+  $$->last_id = $1;
+  //asprintf(&($$->code), "%s", $$->name);
+  //printf("%s", $$->name);
       
  }
 | CONSTANTI  {
-    $$ = malloc(sizeof(struct generation));
-    $$->name = new_var();
-    $$->t = INTEGER;
-    asprintf(&($$->code),"%s = add i32 0, %d\n", $$->name, $1);
+  $$ = malloc(sizeof(struct generation));
+  $$->name = new_var();
+  $$->t = INTEGER;
+  asprintf(&($$->code),"%s = add i32 0, %d\n", $$->name, $1);
   }
 | CONSTANTF  {
-    $$ = malloc(sizeof(struct generation));
-    $$->name = new_var();
-    $$->t = FLOATING;
-    asprintf(&($$->code),"%s = fadd double %s, %s\n", $$->name, double_to_hex_str(0.0), double_to_hex_str($1));
+  $$ = malloc(sizeof(struct generation));
+  $$->name = new_var();
+  $$->t = FLOATING;
+  asprintf(&($$->code),"%s = fadd double %s, %s\n", $$->name, double_to_hex_str(0.0), double_to_hex_str($1));
   }
 | '(' expression ')'{
-    $$ = $2;
+  $$ = $2;
   }
 | IDENTIFIER '(' ')' {
-    $$ = malloc(sizeof(struct generation));
-    $$->name = new_var();
-    get_hash_table(tmp, function_name($1));
-    $$->t = tmp->t;
-    asprintf(&($$->code), "%s", call_function($$->name, tmp->val, "", tmp->t));
+  $$ = malloc(sizeof(struct generation));
+  $$->name = new_var();
+  get_hash_table(tmp, function_name($1));
+  $$->t = tmp->t;
+  asprintf(&($$->code), "%s", call_function($$->name, tmp->val, "", tmp->t));
   }
 | IDENTIFIER '(' argument_expression_list ')'{
-    $$ = malloc(sizeof(struct generation));
-    $$->name = new_var();
-    get_hash_table(tmp, function_name($1));
-    $$->t = tmp->t;
-    asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
+  $$ = malloc(sizeof(struct generation));
+  $$->name = new_var();
+  get_hash_table(tmp, function_name($1));
+  $$->t = tmp->t;
+  asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
   }
 ;
 
@@ -175,20 +163,20 @@ unary_expression
   $$ = op_1($2, SUB_OP);
  }
 | unary_operator unary_expression{
-    $$->name = new_var();
-    $$->t = $2->t;
-    switch($$->t){
-    case INTEGER :
-      asprintf(&($$->code),"%s", $2->code);
-      asprintf(&($$->code),"%s = sub i32 0, %s\n", $$->name, $2->name);
-      break;
-    case FLOATING:
-      asprintf(&($$->code),"%s", $2->code);
-      asprintf(&($$->code),"%s = fsub double %s, %s\n", $$->name, double_to_hex_str(0.0), $2->name);
-      break;
-    default:
-      printf("Error l.278\n");
-    }
+  $$->name = new_var();
+  $$->t = $2->t;
+  switch($$->t){
+  case INTEGER :
+    asprintf(&($$->code),"%s", $2->code);
+    asprintf(&($$->code),"%s = sub i32 0, %s\n", $$->name, $2->name);
+    break;
+  case FLOATING:
+    asprintf(&($$->code),"%s", $2->code);
+    asprintf(&($$->code),"%s = fsub double %s, %s\n", $$->name, double_to_hex_str(0.0), $2->name);
+    break;
+  default:
+    printf("Error l.278\n");
+  }
  }
 ;
 
@@ -200,7 +188,7 @@ unary_operator
 //DOING
 multiplicative_expression
 : unary_expression{
-    $$ = $1;
+  $$ = $1;
  }
 | multiplicative_expression '*' unary_expression {
   $$ = operation_expression($1, $3, MUL_OP, 0);
@@ -216,7 +204,7 @@ multiplicative_expression
 //DOING
 additive_expression
 : multiplicative_expression{
-    $$ = $1;
+  $$ = $1;
  }
 | additive_expression '+' multiplicative_expression{
   $$ = operation_expression($1, $3, ADD_OP, 0);
@@ -254,13 +242,11 @@ comparison_expression
 //DOING
 expression
 : unary_expression assignment_operator conditional_expression{
-  if($1->t == NOT_DEFINE)
-    add_type_elt($1->name, $3->t);
   $$ = operation_expression($1, $3, string_to_op_code($2), 0);
   asprintf(&($$->code), "%s",store_value($3->name, $1->name, $$->t)); 
  }
 | conditional_expression{
-    $$ = $1;
+  $$ = $1;
   }
 ;
 
@@ -297,14 +283,16 @@ declaration
 : type_name declarator_list ';'{
   int length_l = length_llist($2);
   
-  //Taille de la liste
   int i = 0;
   struct expression *tmp;
   for(; i<length_l; i++){
-    tmp = look_for($2, i);
+    tmp = look_for($2, i); 
     tmp->t = string_to_type($1);
     tmp->level = level;
-    add_hash_table(tmp);
+    if(g_hash_table_contains(hash_array[level], tmp->name))
+      printf("Erreur : rédéclaration de la variable %s", tmp->name);
+    else
+      g_hash_table_insert(hash_array[level], tmp->name, tmp);
   }
   
  }
@@ -318,7 +306,7 @@ declarator_list
   $$ = init_llist();
   add_llist($$, $1);
  }
-  //| declarator_list ',' declarator_init
+//| declarator_list ',' declarator_init
 | declarator_list ',' declarator{
   $$ = $1;
   add_llist($$, $3);
@@ -329,12 +317,15 @@ declarator_list
 type_name
 : VOID{
   $$ = "void";
+  last_type = VOID_T;
  }
 | INT{
   $$ = "int";
+  last_type = INTEGER;
   }
 | DOUBLE{
   $$ = "double";
+  last_type = FLOATING;
   }
 ;
 
@@ -344,11 +335,12 @@ type_name
 function_declarator
 : declarator '(' parameter_list ')'{
   $$ = $1;
-  init_function($$, VOID_T, NULL, $3);
+  init_function($$, last_type, new_func($$->name), $3);
+  
  }
 | declarator '(' ')'{
   $$ = $1;
-  init_function($$, VOID_T, NULL, NULL);
+  init_function($$, last_type, new_func($$->name), NULL);
   }
 ;
 
@@ -361,7 +353,7 @@ declarator
  }
 | '(' declarator ')'{
   $$ = $2;
-}
+  }
 | declarator '(' parameter_list ')'{
   $$ = $1;
   init_function($$, VOID_T, NULL, $3);
@@ -373,16 +365,16 @@ declarator
 ;
   
 /*declarator_init
-: declarator{
+  : declarator{
   $$ = $1;
- }
-| IDENTIFIER '=' expression{
+  }
+  | IDENTIFIER '=' expression{
   switch($3->t){
   case INTEGER:
-    $$ = create_int($3
+  $$ = create_int($3
   case FLOATING:
   default:
-    printf("Error\n");
+  printf("Error\n");
   }
   ;*/
 
@@ -402,10 +394,18 @@ parameter_list
 parameter_declaration
 : type_name declarator{
   $$ = $2;
-  if(string_to_type($1) != VOID_T)
-    init_exp($$, NULL, string_to_type($1));
+  if(string_to_type($1) != VOID_T){
+    tmp = init_exp($$, NULL, string_to_type($1), level);
+    if(g_hash_table_contains(hash_array[level],new_param($2->name))){
+      asprintf(&err, "Error: param %s already initialize\n", $2->name);
+      yyerror(err);
+    }
+    else
+      g_hash_table_insert(hash_array[level], new_param($2->name));
+  }
   else
-    printf("Error\n");
+    asprintf(&err,"Error:impossible to have void parameter :%s", $2->name);
+    yyerror(err);
  }
 ;
 
@@ -431,11 +431,37 @@ statement
 //DOING
 LB : '{'{
   level++;
-}
+  if(level >= max_hash){
+    int i = max_hash;
+    max_hash = max_hash * 2;
+    hash_array = realloc(hash_array, max_hash);
+    for(; i < max_hash ; ++i)
+      hash_array[i] = NULL;
+  }
+  if(hash_array[level] != NULL)
+    g_hash_table_remove_all(hash_array[level]);
+  else
+    hash_array[level] = g_hash_table_new(g_str_hash, g_str_equal);
+ }
 ;
 
 //DOING
 RB : '}'{
+  int length = g_hash_table_size(hash_array[level]);
+  char** array = g_hash_table_get_keys_as_array (hash_array[level], length);
+
+  struct expression *old;
+  for(; length > 0 ; --length){
+    tmp = g_hash_table_lookup(hash_array[level], array[length]);
+    if(tmp->level = -1){
+      old = NULL;
+      old = map_symbol(array[length], tmp->t);
+      if(old != NULL){
+	old->val = tmp->val;
+      }
+    }
+  }
+  
   level--;
  }
 ;
@@ -444,6 +470,7 @@ RB : '}'{
 compound_statement
 : LB RB{
   $$ = NULL;
+  
  }
 | LB compound_stat RB{
   $$ = $2;
@@ -620,34 +647,44 @@ extern FILE *yyin;
 char *file_name = NULL;
 
 int yyerror (char *s) {
-    fflush (stdout);
-    fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
-    return 0;
+  fflush (stdout);
+  fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
+  return 0;
 }
 
 
 int main (int argc, char *argv[]) {
-  //char *tab[length_hash];
-  hcreate(length_hash);
-    FILE *input = NULL;
-    if (argc==2) {
-	input = fopen (argv[1], "r");
-	file_name = strdup (argv[1]);
-	if (input) {
-	    yyin = input;
-	}
-	else {
-	  fprintf (stderr, "%s: Could not open %s\n", *argv, argv[1]);
-	    return 1;
-	}
+
+  hash_array = calloc(max_hash, sizeof(GHashTable *));
+  int i = 0;
+  for (; i < max_hash ; ++i)
+    hash_array[i] = NULL;
+  FILE *input = NULL;
+  if (argc==2) {
+    input = fopen (argv[1], "r");
+    file_name = strdup (argv[1]);
+    if (input) {
+      yyin = input;
     }
     else {
-	fprintf (stderr, "%s: error: no input file\n", *argv);
-	return 1;
+      fprintf (stderr, "%s: Could not open %s\n", *argv, argv[1]);
+      return 1;
     }
-    yyparse ();
-    hdestroy();
-    free (file_name);
-    
-    return 0;
+  }
+  else {
+    fprintf (stderr, "%s: error: no input file\n", *argv);
+    return 1;
+  }
+  yyparse ();
+  free (file_name);
+
+  i = 0;
+  for(; i < max_hash ; i++)
+    if(hash_array[i] != NULL){
+      g_hash_table_destroy(hash_array[i]);
+    }
+  free(hash_array);
+
+  
+  return 0;
 }

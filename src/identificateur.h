@@ -20,7 +20,7 @@ union value{
 struct expression{
   enum type t;
   char *name;
-  char *val; //Valeur de retour si fonction ou entier ou float
+  char *val; 
   struct llist *param; //Liste des arguments de la fonction
   int size_param;// -1 si c'est pas une fonction 
   int level;
@@ -39,9 +39,9 @@ struct element{
 
 
 struct expression* create_non_init_exp(char *name);
-struct expression* create_exp(char *name, char *val, enum type t);
-void init_exp(struct expression *e, char *val, enum type t);
-void init_function(struct expression *e, enum type t, char *val, struct llist *l);
+struct expression* create_exp(char *name, enum type t, int level);
+void init_exp(struct expression *e, char *val, enum type t, int level);
+void init_function(struct expression *e,char *val, enum type t, char *val, struct llist *l);
 
 struct llist *init_llist();
 void add_llist(struct llist *l, struct expression *e);

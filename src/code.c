@@ -49,6 +49,8 @@ GHashTable ** hash_array;
 
 struct expression *tmp;
 
+
+
 //Function to create a new var with a correct name
 char *new_var(){
   char *s;
@@ -66,7 +68,7 @@ char *new_func(char *function){
 char *new_param(char *name){
   char *s;
   asprintf(&s,"%s_param", name);
-  return ret;
+  return s;
 }
 
 char *new_label(){
@@ -89,6 +91,71 @@ char *get_type(char *name, enum type t){
     printf("Error\n");
   }
   return ret;
+}
+struct expression *map_symbol(char *name, enum type t){
+  struct expression *old;
+  int i = level;
+  for(; i > 0; --i){
+    if( g_hash_table_contains(hash_array[i], name)){
+      old = g_hash_table_lookup(hash_array[i], name);
+      if(old->t == t)
+	return old;
+    }
+    else if (g_hash_table_contains(hash_array[i], new_param(name))){
+      old = g_hash_table_lookup(hash_array[i], new_param(name));
+      if(old->t == t)
+	return old;
+    }
+  }
+    
+  return NULL;
+}
+
+struct expression *map_with_name(char *name){
+ struct expression *old;
+  int i = level;
+  for(; i > 0; --i){
+    if( g_hash_table_contains(hash_array[i], name)){
+      old = g_hash_table_lookup(hash_array[i], name);
+      return old;
+    }
+    else if (g_hash_table_contains(hash_array[i], new_param(name))){
+      old = g_hash_table_lookup(hash_array[i], new_param(name));
+      return old;
+    }
+  }
+  return NULL;
+}
+
+void value(gpointer key, gpointer value, gpointer user_data){
+  struct expression *old;
+  struct expression *v = (struct expression *)value;
+  if(v->level == -1){
+    old = NULL;
+    old = map_symbol((char *)key, v->t);
+    if(old != NULL){
+      old->val = v->val;
+    }
+  }
+ 
+}
+
+struct expression * action_identifier(char *name){
+  struct expression *ret;
+  enum type t;
+  if(g_hash_table_contains(hash_array[level], name)){
+    ret = g_hash_table_lookup(hash_array[level], name);
+    //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
+  }
+  else{
+    tmp = map_with_name(name);
+    if(tmp==NULL)
+      t = last_type;
+    ret = create_exp(name, new_var(), t, -1);
+    g_hash_table_insert(hash_array[level], name, ret);
+  }
+  return ret;
+
 }
 
 char *call_function(char *var, char *fun, char *arg ,enum type t){
@@ -284,7 +351,6 @@ struct generation *op_1(char *name, enum operation_code op ){
   ret->t = tmp->t;
   ret->last_id = name;
   //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));
-  }
   switch(tmp->t){
   case INTEGER:
     asprintf(&(ret->code),"%s", made_op_int(ret->name, ret->name, "1", op));    
@@ -330,7 +396,7 @@ struct generation *operation_expression(struct generation *a, struct generation 
     printf("Error\n");
   }
   if(c == L_COMP || c == G_COMP || c == LE_COMP || c == GE_COMP || c == EQ_COMP || c == NE_COMP)
-    ret->t == BOOL_T;
+    ret->t = BOOL_T;
   return ret;
 }
 
@@ -384,7 +450,10 @@ char *return_expression(enum type t, char* var){
     break;
   case VOID_T:
     asprintf(&ret,"ret void");
+  default:
+    printf("Error\n");
   }
+ 
   return ret;
 }
 
@@ -422,91 +491,17 @@ char *parameter_to_string(struct expression *e){
   int i = 0;
   char *ret;
   struct expression *param;
-  if(e->size_param != 0){
-    param = look_for(e->param, i);
-    if(is_in_hash_table(key_name(param->name, 1))){
-      get_hash_table(tmp, key_name(param->name, 1));
-      if(tmp->t != param->t){
-	printf("Erreur de type\n");
-	return NULL;
-      }
-    }
-    else
-      add_hash_table(param);
-    switch(param->t){
-    case INTEGER:
-      asprintf(&ret,"i32 %s",param->name);
-      break;
-    case FLOATING:
-      asprintf(&ret,"double %s",param->name);
-    default:
-      printf("Erreur de typage");
-    }
-  }
-  i++;
   for(; i < e->size_param; i++){
     param = look_for(e->param, i);
-    if(is_in_hash_table(key_name(param->name, 1))){
-      get_hash_table(tmp, key_name(param->name, 1));
-      if(tmp->t != param->t){
-	printf("Erreur de type\n");
-	return NULL;
-      }
-    }
-    else
-      add_hash_table(param);
     switch(param->t){
     case INTEGER:
       asprintf(&ret,", i32 %s",param->name);
       break;
     case FLOATING:
-      asprintf(&ret,", double %s",param->name);
+      asprintf(&ret,", double %s",param->name); 
     default:
-      printf("Erreur de typage");
+      printf("Error : type problem in parameter\n");
     }    
   }
   return ret;
-}
-
-
-enum type define_type(char *name){
-  enum type t = NOT_DEFINE;
-  struct expression * old;
-  int i = level;
-  for(; i > 0; --i){
-    if( g_hash_table_contains(hash_array[i], name)){
-      old = g_hash_table_lookup(hash_array[i], name);
-      t = old->t; 
-    }
-  }
-  if(t == NOT_DEFINE)
-      t = last_type;
-  return t;
-}
-
-struct expression * action_identifier(char *name){
-  struct expression *ret
-  if(g_hash_table_contains(hash_array[level], name)){
-    ret = g_hash_table_lookup(hash_array[level], name);
-    //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
-  }
-  else{
-    ret = create_exp(name, new_val(),  define_type(name), -1);
-    g_hash_table_insert(hash_array[level], name, ret);
-  }
-  return ret;
-
-}
-
-struct expression *map_symbol(char *name, enum type t){
-  struct expression *old;
-  int i = level;
-  for(; i > 0; --i){
-    if( g_hash_table_contains(hash_array[i], name)){
-      old = g_hash_table_lookup(hash_array[i], name);
-      if(old->t == t)
-	return old;
-    }
-  }
-  return NULL;
 }

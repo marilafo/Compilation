@@ -6,7 +6,7 @@ struct expression* create_non_init_exp(char *name){
   return e;
 }
 
-struct expression* create_exp(char *name,char *val, enum type t, int level){
+struct expression* create_exp(char *name, char *val, enum type t, int level){
   struct expression *e = malloc(sizeof(struct expression));
   e->name = name;
   init_exp(e,val,t,level);
@@ -21,7 +21,7 @@ void init_exp(struct expression *e, char *val, enum type t, int level){
   e->level = level;
 }
 
-void init_function(struct expression *e, enum type t, char *val, struct llist *l){
+void init_function(struct expression *e, char *val, enum type t, struct llist *l){
   e->t = t;
   e->val = val;
   if(l == NULL)
@@ -72,6 +72,17 @@ struct expression* look_for(struct llist *l, int indice){
   return tmp->val;
 }
 
+int nb_occ(struct llist *l, char *name){
+  int total = 0;
+  struct element *tmp;
+  tmp = l->first;
+  while(tmp != NULL){
+    if(tmp->val->name == name)
+      total++;
+    tmp = tmp->next;
+  }
+  return total;
+}
 
 /*//parcours dans la liste
 void parcours(llist liste)

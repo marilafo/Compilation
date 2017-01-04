@@ -88,7 +88,9 @@ shift_expression
 //DOING
 primary_expression
 : IDENTIFIER {
+  printf("%s\n",$1);
   tmp = action_identifier($1);
+  $$ = malloc(sizeof(struct generation));
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->code = NULL;
@@ -113,17 +115,33 @@ primary_expression
   $$ = $2;
   }
 | IDENTIFIER '(' ')' {
+  printf("%s\n",$1);
   $$ = malloc(sizeof(struct generation));
-  $$->name = new_var();
-  get_hash_table(tmp, function_name($1));
+  tmp = map_with_name(new_func($1));
+  //faire la vérif de type
+  if(tmp == NULL){
+    asprintf(&err, "Error: %s function not define", $1);
+    yyerror(err);
+  }
+    
+  $$->name = tmp->val;
   $$->t = tmp->t;
+  $$->last_id = NULL;
   asprintf(&($$->code), "%s", call_function($$->name, tmp->val, "", tmp->t));
   }
 | IDENTIFIER '(' argument_expression_list ')'{
+  printf("%s\n", $1);
   $$ = malloc(sizeof(struct generation));
-  $$->name = new_var();
-  get_hash_table(tmp, function_name($1));
+  tmp = map_with_name(new_func($1));
+  //faire la vérif de type
+  if(tmp == NULL){
+    asprintf(&err, "Error: %s function not define", $1);
+    yyerror(err);
+  }
+    
+  $$->name = tmp->val;
   $$->t = tmp->t;
+  $$->last_id = NULL;
   asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
   }
 ;
@@ -134,9 +152,11 @@ postfix_expression
   $$ = $1;
  }
 | IDENTIFIER INC_OP {
+  printf("%s\n", $1);
   $$ = op_1($1,ADD_OP);
  }
 | IDENTIFIER DEC_OP{
+  printf("%s\n", $1);
   $$ = op_1($1,SUB_OP);
  }
 ;
@@ -157,9 +177,11 @@ unary_expression
   $$ = $1;
  }
 | INC_OP IDENTIFIER {
+  printf("%s\n",$2);
   $$ = op_1($2, ADD_OP);
  }
 | DEC_OP IDENTIFIER{
+  printf("%s\n",$2);
   $$ = op_1($2, SUB_OP);
  }
 | unary_operator unary_expression{
@@ -335,12 +357,28 @@ type_name
 function_declarator
 : declarator '(' parameter_list ')'{
   $$ = $1;
-  init_function($$, last_type, new_func($$->name), $3);
-  
+  init_function($$, new_func($$->name), last_type, $3);
+
+  int i = 0;
+  for(; i < length_llist($3); ++i){
+    tmp = look_for($3, i);
+    if(tmp->t != VOID_T){
+      if(nb_occ($3, tmp->name) != 1){
+	asprintf(&err, "Error: param %s already initialize\n", tmp->name);
+	yyerror(err);
+      }
+      if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
+	g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
+    }
+    else{
+      asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
+      yyerror(err);
+    }
+  }
  }
 | declarator '(' ')'{
   $$ = $1;
-  init_function($$, last_type, new_func($$->name), NULL);
+  init_function($$,new_func($$->name), last_type, NULL);
   }
 ;
 
@@ -349,18 +387,33 @@ function_declarator
 //GENERATION CODE
 declarator
 : IDENTIFIER {
+  printf("%s\n",$1);
   $$ = create_non_init_exp($1);
  }
 | '(' declarator ')'{
   $$ = $2;
   }
 | declarator '(' parameter_list ')'{
-  $$ = $1;
-  init_function($$, VOID_T, NULL, $3);
+    $$ = $1;
+    init_function($$, new_func($$->name), last_type, $3);
+    int i = 0;
+    for(; i < length_llist($3); ++i){
+      tmp = look_for($3, i);
+      if(tmp->t != VOID_T){
+	if(nb_occ($3, tmp->name) != 1)
+	  asprintf(&err, "Error: param %s already initialize\n", tmp->name);
+	yyerror(err);
+	if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
+	  g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
+      }
+      else
+	asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
+      yyerror(err);
+    }
   }
 | declarator '(' ')'{
   $$ = $1;
-  init_function($$, VOID_T, NULL, NULL);
+  init_function($$, new_func($$->name), last_type, NULL);
   }
 ;
   
@@ -394,18 +447,6 @@ parameter_list
 parameter_declaration
 : type_name declarator{
   $$ = $2;
-  if(string_to_type($1) != VOID_T){
-    tmp = init_exp($$, NULL, string_to_type($1), level);
-    if(g_hash_table_contains(hash_array[level],new_param($2->name))){
-      asprintf(&err, "Error: param %s already initialize\n", $2->name);
-      yyerror(err);
-    }
-    else
-      g_hash_table_insert(hash_array[level], new_param($2->name));
-  }
-  else
-    asprintf(&err,"Error:impossible to have void parameter :%s", $2->name);
-    yyerror(err);
  }
 ;
 
@@ -447,20 +488,7 @@ LB : '{'{
 
 //DOING
 RB : '}'{
-  int length = g_hash_table_size(hash_array[level]);
-  char** array = g_hash_table_get_keys_as_array (hash_array[level], length);
-
-  struct expression *old;
-  for(; length > 0 ; --length){
-    tmp = g_hash_table_lookup(hash_array[level], array[length]);
-    if(tmp->level = -1){
-      old = NULL;
-      old = map_symbol(array[length], tmp->t);
-      if(old != NULL){
-	old->val = tmp->val;
-      }
-    }
-  }
+  g_hash_table_foreach(hash_array[level], value, NULL);
   
   level--;
  }
@@ -611,19 +639,17 @@ external_declaration
 //TODO
 function_definition
 : type_name function_declarator compound_statement{
-  printf("Coucou\n");
   $2->t = string_to_type($1);
   $2->level = level;
-  add_hash_table($2);
   switch($2->t){
   case INTEGER:
-    asprintf(&$$,"define i32 @%s(%s){", function_name($2->name), parameter_to_string($2));
+    asprintf(&$$,"define i32 %s(%s){", new_func($2->name), parameter_to_string($2));
     break;
   case FLOATING:
-    asprintf(&$$,"define double @%s(%s){", function_name($2->name), parameter_to_string($2));
+    asprintf(&$$,"define double %s(%s){", new_func($2->name), parameter_to_string($2));
     break;
   case VOID_T:
-    asprintf(&$$,"define void @%s(%s){", function_name($2->name), parameter_to_string($2));
+    asprintf(&$$,"define void %s(%s){", new_func($2->name), parameter_to_string($2));
     break;
   default:
     printf("Error\n");
@@ -652,11 +678,11 @@ int yyerror (char *s) {
   return 0;
 }
 
-
 int main (int argc, char *argv[]) {
 
   hash_array = calloc(max_hash, sizeof(GHashTable *));
-  int i = 0;
+  hash_array[level] = g_hash_table_new(g_str_hash, g_str_equal);
+  int i = 1;
   for (; i < max_hash ; ++i)
     hash_array[i] = NULL;
   FILE *input = NULL;

@@ -39,13 +39,14 @@ struct element{
 
 
 struct expression* create_non_init_exp(char *name);
-struct expression* create_exp(char *name, enum type t, int level);
+struct expression* create_exp(char *name, char *val, enum type t, int level);
 void init_exp(struct expression *e, char *val, enum type t, int level);
-void init_function(struct expression *e,char *val, enum type t, char *val, struct llist *l);
+void init_function(struct expression *e,char *val, enum type t, struct llist *l);
 
 struct llist *init_llist();
 void add_llist(struct llist *l, struct expression *e);
 int length_llist(struct llist *list);
 struct expression* look_for(struct llist *l, int indice);
+int nb_occ(struct llist *l, char *name);
 //void parcours(llist);
 #endif 

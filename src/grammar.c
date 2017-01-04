@@ -64,23 +64,23 @@
 /* Copy the first part of user declarations.  */
 #line 1 "grammar.y" /* yacc.c:339  */
 
-    #define _GNU_SOURCE
-    #include <stdio.h>
-    #include <search.h>
-    #include "identificateur.h"
-    #include "double_to_hex.c"
-    #include "code.c"
+#define _GNU_SOURCE
+#include <stdio.h>
+#include "identificateur.h"
+#include "double_to_hex.c"
+#include "code.c"
   
   
   //A enlever quand on aura les listes
   //int tab = 0;
   //int p = 0;
   
-    extern int yylineno;
-    int yylex ();
-    int yyerror ();
+  extern int yylineno;
+  int yylex ();
+  int yyerror ();
 
     
+  
 
 #line 86 "grammar.c" /* yacc.c:339  */
 
@@ -156,7 +156,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 38 "grammar.y" /* yacc.c:355  */
+#line 37 "grammar.y" /* yacc.c:355  */
 
   char *string;
   int n;
@@ -484,17 +484,17 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    51,    51,    58,    61,    68,    71,    78,    81,    84,
-      91,   109,   114,   119,   122,   128,   138,   141,   144,   151,
-     154,   161,   164,   167,   170,   190,   195,   198,   201,   204,
-     211,   214,   217,   224,   227,   230,   233,   236,   239,   242,
-     249,   253,   260,   263,   266,   269,   272,   275,   278,   281,
-     288,   308,   313,   321,   324,   327,   336,   340,   350,   353,
-     356,   360,   382,   386,   394,   405,   408,   411,   414,   417,
-     423,   429,   436,   439,   442,   449,   452,   459,   462,   469,
-     472,   479,   482,   489,   493,   500,   503,   506,   509,   512,
-     515,   518,   521,   524,   527,   534,   537,   545,   548,   555,
-     559,   567,   570,   577
+       0,    50,    50,    57,    60,    67,    70,    77,    80,    83,
+      90,   102,   108,   114,   117,   132,   151,   154,   158,   166,
+     169,   176,   179,   183,   187,   207,   212,   215,   218,   221,
+     228,   231,   234,   241,   244,   247,   250,   253,   256,   259,
+     266,   270,   277,   280,   283,   286,   289,   292,   295,   298,
+     305,   327,   332,   340,   344,   348,   358,   379,   389,   393,
+     396,   414,   436,   440,   448,   455,   458,   461,   464,   467,
+     473,   490,   499,   503,   506,   513,   516,   523,   526,   533,
+     536,   543,   546,   553,   557,   564,   567,   570,   573,   576,
+     579,   582,   585,   588,   591,   598,   601,   609,   612,   619,
+     623,   631,   634,   641
 };
 #endif
 
@@ -1418,7 +1418,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 51 "grammar.y" /* yacc.c:1646  */
+#line 50 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
@@ -1426,7 +1426,7 @@ yyreduce:
     break;
 
   case 3:
-#line 58 "grammar.y" /* yacc.c:1646  */
+#line 57 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
@@ -1434,7 +1434,7 @@ yyreduce:
     break;
 
   case 4:
-#line 61 "grammar.y" /* yacc.c:1646  */
+#line 60 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), OR_OP, 0);
  }
@@ -1442,7 +1442,7 @@ yyreduce:
     break;
 
   case 5:
-#line 68 "grammar.y" /* yacc.c:1646  */
+#line 67 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
@@ -1450,7 +1450,7 @@ yyreduce:
     break;
 
   case 6:
-#line 71 "grammar.y" /* yacc.c:1646  */
+#line 70 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), AND_OP, 0);
  }
@@ -1458,7 +1458,7 @@ yyreduce:
     break;
 
   case 7:
-#line 78 "grammar.y" /* yacc.c:1646  */
+#line 77 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
@@ -1466,7 +1466,7 @@ yyreduce:
     break;
 
   case 8:
-#line 81 "grammar.y" /* yacc.c:1646  */
+#line 80 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), SHL_OP, 0);
  }
@@ -1474,7 +1474,7 @@ yyreduce:
     break;
 
   case 9:
-#line 84 "grammar.y" /* yacc.c:1646  */
+#line 83 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), SHR_OP, 0);
  }
@@ -1482,823 +1482,886 @@ yyreduce:
     break;
 
   case 10:
-#line 91 "grammar.y" /* yacc.c:1646  */
+#line 90 "grammar.y" /* yacc.c:1646  */
     {
-  if(is_in_hash_table(key_name((yyvsp[0].string),level))){
-      (yyval.gen)->name = tmp->val;
-      get_hash_table(tmp, (yyvsp[0].string));
-      (yyval.gen)->t = tmp->t;
-      //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
-    }
-    else{
-      (yyval.gen)->name = new_var();
-      tmp = create_non_init_exp((yyvsp[0].string));
-      tmp->val = (yyval.gen)->name;
-      tmp->size_param = -1;
-      add_hash_table(tmp);
-    }
-    asprintf(&((yyval.gen)->code), "%s", (yyval.gen)->name);
-    printf("%s", (yyval.gen)->name);
+  printf("%s\n",(yyvsp[0].string));
+  tmp = action_identifier((yyvsp[0].string));
+  (yyval.gen) = malloc(sizeof(struct generation));
+  (yyval.gen)->name = tmp->val;
+  (yyval.gen)->t = tmp->t;
+  (yyval.gen)->code = NULL;
+  (yyval.gen)->last_id = (yyvsp[0].string);
+  //asprintf(&($$->code), "%s", $$->name);
+  //printf("%s", $$->name);
       
  }
-#line 1505 "grammar.c" /* yacc.c:1646  */
+#line 1499 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 109 "grammar.y" /* yacc.c:1646  */
+#line 102 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen)->name = new_var();
-    (yyval.gen)->t = INTEGER;
-    asprintf(&((yyval.gen)->code),"%s = add i32 0, %d\n", (yyval.gen)->name, (yyvsp[0].n));
+  (yyval.gen) = malloc(sizeof(struct generation));
+  (yyval.gen)->name = new_var();
+  (yyval.gen)->t = INTEGER;
+  asprintf(&((yyval.gen)->code),"%s = add i32 0, %d\n", (yyval.gen)->name, (yyvsp[0].n));
   }
-#line 1515 "grammar.c" /* yacc.c:1646  */
+#line 1510 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 114 "grammar.y" /* yacc.c:1646  */
+#line 108 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen)->name = new_var();
-    (yyval.gen)->t = FLOATING;
-    asprintf(&((yyval.gen)->code),"%s = fadd double %s, %s\n", (yyval.gen)->name, double_to_hex_str(0.0), double_to_hex_str((yyvsp[0].f)));
+  (yyval.gen) = malloc(sizeof(struct generation));
+  (yyval.gen)->name = new_var();
+  (yyval.gen)->t = FLOATING;
+  asprintf(&((yyval.gen)->code),"%s = fadd double %s, %s\n", (yyval.gen)->name, double_to_hex_str(0.0), double_to_hex_str((yyvsp[0].f)));
   }
-#line 1525 "grammar.c" /* yacc.c:1646  */
+#line 1521 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 119 "grammar.y" /* yacc.c:1646  */
+#line 114 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen) = (yyvsp[-1].gen);
+  (yyval.gen) = (yyvsp[-1].gen);
   }
-#line 1533 "grammar.c" /* yacc.c:1646  */
+#line 1529 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 122 "grammar.y" /* yacc.c:1646  */
+#line 117 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen)->name = new_var();
-    get_hash_table(tmp, function_name((yyvsp[-2].string)));
-    (yyval.gen)->t = tmp->t;
-    asprintf(&((yyval.gen)->code), "%s", call_function((yyval.gen)->name, tmp->val, "", tmp->t));
+  printf("%s\n",(yyvsp[-2].string));
+  (yyval.gen) = malloc(sizeof(struct generation));
+  tmp = map_with_name(new_func((yyvsp[-2].string)));
+  //faire la vérif de type
+  if(tmp == NULL){
+    asprintf(&err, "Error: %s function not define", (yyvsp[-2].string));
+    yyerror(err);
   }
-#line 1544 "grammar.c" /* yacc.c:1646  */
+    
+  (yyval.gen)->name = tmp->val;
+  (yyval.gen)->t = tmp->t;
+  (yyval.gen)->last_id = NULL;
+  asprintf(&((yyval.gen)->code), "%s", call_function((yyval.gen)->name, tmp->val, "", tmp->t));
+  }
+#line 1549 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 128 "grammar.y" /* yacc.c:1646  */
+#line 132 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen)->name = new_var();
-    get_hash_table(tmp, function_name((yyvsp[-3].string)));
-    (yyval.gen)->t = tmp->t;
-    asprintf(&((yyval.gen)->code), "%s", call_function((yyval.gen)->name, tmp->val, (yyvsp[-1].string), tmp->t));
+  printf("%s\n", (yyvsp[-3].string));
+  (yyval.gen) = malloc(sizeof(struct generation));
+  tmp = map_with_name(new_func((yyvsp[-3].string)));
+  //faire la vérif de type
+  if(tmp == NULL){
+    asprintf(&err, "Error: %s function not define", (yyvsp[-3].string));
+    yyerror(err);
   }
-#line 1555 "grammar.c" /* yacc.c:1646  */
+    
+  (yyval.gen)->name = tmp->val;
+  (yyval.gen)->t = tmp->t;
+  (yyval.gen)->last_id = NULL;
+  asprintf(&((yyval.gen)->code), "%s", call_function((yyval.gen)->name, tmp->val, (yyvsp[-1].string), tmp->t));
+  }
+#line 1569 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 138 "grammar.y" /* yacc.c:1646  */
+#line 151 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
-#line 1563 "grammar.c" /* yacc.c:1646  */
+#line 1577 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 141 "grammar.y" /* yacc.c:1646  */
+#line 154 "grammar.y" /* yacc.c:1646  */
     {
+  printf("%s\n", (yyvsp[-1].string));
   (yyval.gen) = op_1((yyvsp[-1].string),ADD_OP);
  }
-#line 1571 "grammar.c" /* yacc.c:1646  */
+#line 1586 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 144 "grammar.y" /* yacc.c:1646  */
+#line 158 "grammar.y" /* yacc.c:1646  */
     {
+  printf("%s\n", (yyvsp[-1].string));
   (yyval.gen) = op_1((yyvsp[-1].string),SUB_OP);
  }
-#line 1579 "grammar.c" /* yacc.c:1646  */
+#line 1595 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 151 "grammar.y" /* yacc.c:1646  */
+#line 166 "grammar.y" /* yacc.c:1646  */
     {
   asprintf(&(yyval.string),"%s",get_type((yyvsp[0].gen)->name, (yyvsp[0].gen)->t));
  }
-#line 1587 "grammar.c" /* yacc.c:1646  */
+#line 1603 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 154 "grammar.y" /* yacc.c:1646  */
+#line 169 "grammar.y" /* yacc.c:1646  */
     {
   asprintf(&(yyval.string), "%s, ", (yyvsp[-2].string));
   asprintf(&(yyval.string),"%s",get_type((yyvsp[0].gen)->name, (yyvsp[0].gen)->t));
   }
-#line 1596 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 161 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = (yyvsp[0].gen);
- }
-#line 1604 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 22:
-#line 164 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = op_1((yyvsp[0].string), ADD_OP);
- }
 #line 1612 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 167 "grammar.y" /* yacc.c:1646  */
+  case 21:
+#line 176 "grammar.y" /* yacc.c:1646  */
     {
-  (yyval.gen) = op_1((yyvsp[0].string), SUB_OP);
+  (yyval.gen) = (yyvsp[0].gen);
  }
 #line 1620 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 170 "grammar.y" /* yacc.c:1646  */
+  case 22:
+#line 179 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen)->name = new_var();
-    (yyval.gen)->t = (yyvsp[0].gen)->t;
-    switch((yyval.gen)->t){
-    case INTEGER :
-      asprintf(&((yyval.gen)->code),"%s", (yyvsp[0].gen)->code);
-      asprintf(&((yyval.gen)->code),"%s = sub i32 0, %s\n", (yyval.gen)->name, (yyvsp[0].gen)->name);
-      break;
-    case FLOATING:
-      asprintf(&((yyval.gen)->code),"%s", (yyvsp[0].gen)->code);
-      asprintf(&((yyval.gen)->code),"%s = fsub double %s, %s\n", (yyval.gen)->name, double_to_hex_str(0.0), (yyvsp[0].gen)->name);
-      break;
-    default:
-      printf("Error l.278\n");
-    }
+  printf("%s\n",(yyvsp[0].string));
+  (yyval.gen) = op_1((yyvsp[0].string), ADD_OP);
  }
-#line 1641 "grammar.c" /* yacc.c:1646  */
+#line 1629 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 183 "grammar.y" /* yacc.c:1646  */
+    {
+  printf("%s\n",(yyvsp[0].string));
+  (yyval.gen) = op_1((yyvsp[0].string), SUB_OP);
+ }
+#line 1638 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 187 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen)->name = new_var();
+  (yyval.gen)->t = (yyvsp[0].gen)->t;
+  switch((yyval.gen)->t){
+  case INTEGER :
+    asprintf(&((yyval.gen)->code),"%s", (yyvsp[0].gen)->code);
+    asprintf(&((yyval.gen)->code),"%s = sub i32 0, %s\n", (yyval.gen)->name, (yyvsp[0].gen)->name);
+    break;
+  case FLOATING:
+    asprintf(&((yyval.gen)->code),"%s", (yyvsp[0].gen)->code);
+    asprintf(&((yyval.gen)->code),"%s = fsub double %s, %s\n", (yyval.gen)->name, double_to_hex_str(0.0), (yyvsp[0].gen)->name);
+    break;
+  default:
+    printf("Error l.278\n");
+  }
+ }
+#line 1659 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 195 "grammar.y" /* yacc.c:1646  */
-    {
-    (yyval.gen) = (yyvsp[0].gen);
- }
-#line 1649 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 27:
-#line 198 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), MUL_OP, 0);
-  }
-#line 1657 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 28:
-#line 201 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), DIV_OP, 0);
-  }
-#line 1665 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 204 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), REM_OP, 0);
- }
-#line 1673 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 211 "grammar.y" /* yacc.c:1646  */
-    {
-    (yyval.gen) = (yyvsp[0].gen);
- }
-#line 1681 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 214 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), ADD_OP, 0);
-  }
-#line 1689 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 32:
-#line 217 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), SUB_OP, 0);
-  }
-#line 1697 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 33:
-#line 224 "grammar.y" /* yacc.c:1646  */
+#line 212 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = (yyvsp[0].gen);
  }
-#line 1705 "grammar.c" /* yacc.c:1646  */
+#line 1667 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 27:
+#line 215 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), MUL_OP, 0);
+  }
+#line 1675 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 218 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), DIV_OP, 0);
+  }
+#line 1683 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 221 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), REM_OP, 0);
+ }
+#line 1691 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 228 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = (yyvsp[0].gen);
+ }
+#line 1699 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 31:
+#line 231 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), ADD_OP, 0);
+  }
+#line 1707 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 32:
+#line 234 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), SUB_OP, 0);
+  }
+#line 1715 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 33:
+#line 241 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.gen) = (yyvsp[0].gen);
+ }
+#line 1723 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 227 "grammar.y" /* yacc.c:1646  */
+#line 244 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), L_COMP, 1);
   }
-#line 1713 "grammar.c" /* yacc.c:1646  */
+#line 1731 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 230 "grammar.y" /* yacc.c:1646  */
+#line 247 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), G_COMP, 1);
   }
-#line 1721 "grammar.c" /* yacc.c:1646  */
+#line 1739 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 233 "grammar.y" /* yacc.c:1646  */
+#line 250 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), LE_COMP, 1);
  }
-#line 1729 "grammar.c" /* yacc.c:1646  */
+#line 1747 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 236 "grammar.y" /* yacc.c:1646  */
+#line 253 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), GE_COMP, 1);
  }
-#line 1737 "grammar.c" /* yacc.c:1646  */
+#line 1755 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 239 "grammar.y" /* yacc.c:1646  */
+#line 256 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), EQ_COMP, 1);
  }
-#line 1745 "grammar.c" /* yacc.c:1646  */
+#line 1763 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 242 "grammar.y" /* yacc.c:1646  */
+#line 259 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), NE_COMP, 1);
  }
-#line 1753 "grammar.c" /* yacc.c:1646  */
+#line 1771 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 249 "grammar.y" /* yacc.c:1646  */
+#line 266 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.gen) = operation_expression((yyvsp[-2].gen), (yyvsp[0].gen), string_to_op_code((yyvsp[-1].string)), 0);
   asprintf(&((yyval.gen)->code), "%s",store_value((yyvsp[0].gen)->name, (yyvsp[-2].gen)->name, (yyval.gen)->t)); 
  }
-#line 1762 "grammar.c" /* yacc.c:1646  */
+#line 1780 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 253 "grammar.y" /* yacc.c:1646  */
+#line 270 "grammar.y" /* yacc.c:1646  */
     {
-    (yyval.gen) = (yyvsp[0].gen);
+  (yyval.gen) = (yyvsp[0].gen);
   }
-#line 1770 "grammar.c" /* yacc.c:1646  */
+#line 1788 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 260 "grammar.y" /* yacc.c:1646  */
+#line 277 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "ass";
  }
-#line 1778 "grammar.c" /* yacc.c:1646  */
+#line 1796 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 263 "grammar.y" /* yacc.c:1646  */
+#line 280 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "mul";
   }
-#line 1786 "grammar.c" /* yacc.c:1646  */
+#line 1804 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 266 "grammar.y" /* yacc.c:1646  */
+#line 283 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "div";
   }
-#line 1794 "grammar.c" /* yacc.c:1646  */
+#line 1812 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 269 "grammar.y" /* yacc.c:1646  */
+#line 286 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "rem";
   }
-#line 1802 "grammar.c" /* yacc.c:1646  */
+#line 1820 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 272 "grammar.y" /* yacc.c:1646  */
+#line 289 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "shl";
   }
-#line 1810 "grammar.c" /* yacc.c:1646  */
+#line 1828 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 275 "grammar.y" /* yacc.c:1646  */
+#line 292 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "shr";
   }
-#line 1818 "grammar.c" /* yacc.c:1646  */
+#line 1836 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 278 "grammar.y" /* yacc.c:1646  */
+#line 295 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "add";
   }
-#line 1826 "grammar.c" /* yacc.c:1646  */
+#line 1844 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 281 "grammar.y" /* yacc.c:1646  */
+#line 298 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "sub";
   }
-#line 1834 "grammar.c" /* yacc.c:1646  */
+#line 1852 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 288 "grammar.y" /* yacc.c:1646  */
+#line 305 "grammar.y" /* yacc.c:1646  */
     {
   int length_l = length_llist((yyvsp[-1].list));
   
-  //Taille de la liste
   int i = 0;
   struct expression *tmp;
   for(; i<length_l; i++){
-    tmp = look_for((yyvsp[-1].list), i);
+    tmp = look_for((yyvsp[-1].list), i); 
     tmp->t = string_to_type((yyvsp[-2].string));
     tmp->level = level;
-    add_hash_table(tmp);
+    if(g_hash_table_contains(hash_array[level], tmp->name))
+      printf("Erreur : rédéclaration de la variable %s", tmp->name);
+    else
+      g_hash_table_insert(hash_array[level], tmp->name, tmp);
   }
   
  }
-#line 1853 "grammar.c" /* yacc.c:1646  */
+#line 1873 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 308 "grammar.y" /* yacc.c:1646  */
+#line 327 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.list) = init_llist();
   add_llist((yyval.list), (yyvsp[0].exp));
  }
-#line 1862 "grammar.c" /* yacc.c:1646  */
+#line 1882 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 313 "grammar.y" /* yacc.c:1646  */
+#line 332 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.list) = (yyvsp[-2].list);
   add_llist((yyval.list), (yyvsp[0].exp));
   }
-#line 1871 "grammar.c" /* yacc.c:1646  */
+#line 1891 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 321 "grammar.y" /* yacc.c:1646  */
+#line 340 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "void";
+  last_type = VOID_T;
  }
-#line 1879 "grammar.c" /* yacc.c:1646  */
+#line 1900 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 324 "grammar.y" /* yacc.c:1646  */
+#line 344 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "int";
+  last_type = INTEGER;
   }
-#line 1887 "grammar.c" /* yacc.c:1646  */
+#line 1909 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 327 "grammar.y" /* yacc.c:1646  */
+#line 348 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = "double";
+  last_type = FLOATING;
   }
-#line 1895 "grammar.c" /* yacc.c:1646  */
+#line 1918 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 336 "grammar.y" /* yacc.c:1646  */
+#line 358 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.exp) = (yyvsp[-3].exp);
-  init_function((yyval.exp), VOID_T, NULL, (yyvsp[-1].list));
+  init_function((yyval.exp), new_func((yyval.exp)->name), last_type, (yyvsp[-1].list));
+
+  int i = 0;
+  for(; i < length_llist((yyvsp[-1].list)); ++i){
+    tmp = look_for((yyvsp[-1].list), i);
+    if(tmp->t != VOID_T){
+      if(nb_occ((yyvsp[-1].list), tmp->name) != 1){
+	asprintf(&err, "Error: param %s already initialize\n", tmp->name);
+	yyerror(err);
+      }
+      if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
+	g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
+    }
+    else{
+      asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
+      yyerror(err);
+    }
+  }
  }
-#line 1904 "grammar.c" /* yacc.c:1646  */
+#line 1944 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 340 "grammar.y" /* yacc.c:1646  */
+#line 379 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.exp) = (yyvsp[-2].exp);
-  init_function((yyval.exp), VOID_T, NULL, NULL);
+  init_function((yyval.exp),new_func((yyval.exp)->name), last_type, NULL);
   }
-#line 1913 "grammar.c" /* yacc.c:1646  */
+#line 1953 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 350 "grammar.y" /* yacc.c:1646  */
+#line 389 "grammar.y" /* yacc.c:1646  */
     {
+  printf("%s\n",(yyvsp[0].string));
   (yyval.exp) = create_non_init_exp((yyvsp[0].string));
  }
-#line 1921 "grammar.c" /* yacc.c:1646  */
+#line 1962 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 353 "grammar.y" /* yacc.c:1646  */
+#line 393 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.exp) = (yyvsp[-1].exp);
-}
-#line 1929 "grammar.c" /* yacc.c:1646  */
+  }
+#line 1970 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 356 "grammar.y" /* yacc.c:1646  */
+#line 396 "grammar.y" /* yacc.c:1646  */
     {
-  (yyval.exp) = (yyvsp[-3].exp);
-  init_function((yyval.exp), VOID_T, NULL, (yyvsp[-1].list));
-  }
-#line 1938 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 61:
-#line 360 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.exp) = (yyvsp[-2].exp);
-  init_function((yyval.exp), VOID_T, NULL, NULL);
-  }
-#line 1947 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 62:
-#line 382 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.list) = init_llist();
-  add_llist((yyval.list), (yyvsp[0].exp));
- }
-#line 1956 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 63:
-#line 386 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.list) = (yyvsp[-2].list);
-  add_llist((yyval.list), (yyvsp[0].exp));
-  }
-#line 1965 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 64:
-#line 394 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.exp) = (yyvsp[0].exp);
-  if(string_to_type((yyvsp[-1].string)) != VOID_T)
-    init_exp((yyval.exp), NULL, string_to_type((yyvsp[-1].string)));
-  else
-    printf("Error\n");
- }
-#line 1977 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 65:
-#line 405 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[0].string);
- }
-#line 1985 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 66:
-#line 408 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[0].string);
+    (yyval.exp) = (yyvsp[-3].exp);
+    init_function((yyval.exp), new_func((yyval.exp)->name), last_type, (yyvsp[-1].list));
+    int i = 0;
+    for(; i < length_llist((yyvsp[-1].list)); ++i){
+      tmp = look_for((yyvsp[-1].list), i);
+      if(tmp->t != VOID_T){
+	if(nb_occ((yyvsp[-1].list), tmp->name) != 1)
+	  asprintf(&err, "Error: param %s already initialize\n", tmp->name);
+	yyerror(err);
+	if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
+	  g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
+      }
+      else
+	asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
+      yyerror(err);
+    }
   }
 #line 1993 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 67:
-#line 411 "grammar.y" /* yacc.c:1646  */
+  case 61:
+#line 414 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.exp) = (yyvsp[-2].exp);
+  init_function((yyval.exp), new_func((yyval.exp)->name), last_type, NULL);
+  }
+#line 2002 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 62:
+#line 436 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.list) = init_llist();
+  add_llist((yyval.list), (yyvsp[0].exp));
+ }
+#line 2011 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 63:
+#line 440 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.list) = (yyvsp[-2].list);
+  add_llist((yyval.list), (yyvsp[0].exp));
+  }
+#line 2020 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 448 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.exp) = (yyvsp[0].exp);
+ }
+#line 2028 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 65:
+#line 455 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[0].string);
+ }
+#line 2036 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 66:
+#line 458 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
   }
-#line 2001 "grammar.c" /* yacc.c:1646  */
+#line 2044 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 67:
+#line 461 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[0].string);
+  }
+#line 2052 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 414 "grammar.y" /* yacc.c:1646  */
+#line 464 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
   }
-#line 2009 "grammar.c" /* yacc.c:1646  */
+#line 2060 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 417 "grammar.y" /* yacc.c:1646  */
+#line 467 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
   }
-#line 2017 "grammar.c" /* yacc.c:1646  */
+#line 2068 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 423 "grammar.y" /* yacc.c:1646  */
+#line 473 "grammar.y" /* yacc.c:1646  */
     {
   level++;
-}
-#line 2025 "grammar.c" /* yacc.c:1646  */
+  if(level >= max_hash){
+    int i = max_hash;
+    max_hash = max_hash * 2;
+    hash_array = realloc(hash_array, max_hash);
+    for(; i < max_hash ; ++i)
+      hash_array[i] = NULL;
+  }
+  if(hash_array[level] != NULL)
+    g_hash_table_remove_all(hash_array[level]);
+  else
+    hash_array[level] = g_hash_table_new(g_str_hash, g_str_equal);
+ }
+#line 2087 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 429 "grammar.y" /* yacc.c:1646  */
+#line 490 "grammar.y" /* yacc.c:1646  */
     {
+  g_hash_table_foreach(hash_array[level], value, NULL);
+  
   level--;
- }
-#line 2033 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 72:
-#line 436 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = NULL;
- }
-#line 2041 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 73:
-#line 439 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[-1].string);
- }
-#line 2049 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 74:
-#line 442 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[-1].string);
- }
-#line 2057 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 75:
-#line 449 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[0].string);
- }
-#line 2065 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 76:
-#line 452 "grammar.y" /* yacc.c:1646  */
-    {
-  asprintf(&(yyval.string),"%s%s", (yyvsp[-1].string), (yyvsp[0].string));
- }
-#line 2073 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 77:
-#line 459 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[0].string);
- }
-#line 2081 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 78:
-#line 462 "grammar.y" /* yacc.c:1646  */
-    {
-  asprintf(&(yyval.string), "%s%s", (yyvsp[-1].string), (yyvsp[0].string));
- }
-#line 2089 "grammar.c" /* yacc.c:1646  */
-    break;
-
-  case 79:
-#line 469 "grammar.y" /* yacc.c:1646  */
-    {
-  (yyval.string) = (yyvsp[0].string);
  }
 #line 2097 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 80:
-#line 472 "grammar.y" /* yacc.c:1646  */
+  case 72:
+#line 499 "grammar.y" /* yacc.c:1646  */
     {
-  asprintf(&(yyval.string),"%s%s", (yyvsp[-1].string), (yyvsp[0].string));
+  (yyval.string) = NULL;
+  
  }
-#line 2105 "grammar.c" /* yacc.c:1646  */
+#line 2106 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 81:
-#line 479 "grammar.y" /* yacc.c:1646  */
+  case 73:
+#line 503 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[-1].string);
+ }
+#line 2114 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 74:
+#line 506 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[-1].string);
+ }
+#line 2122 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 75:
+#line 513 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
  }
-#line 2113 "grammar.c" /* yacc.c:1646  */
+#line 2130 "grammar.c" /* yacc.c:1646  */
     break;
 
-  case 82:
-#line 482 "grammar.y" /* yacc.c:1646  */
+  case 76:
+#line 516 "grammar.y" /* yacc.c:1646  */
     {
   asprintf(&(yyval.string),"%s%s", (yyvsp[-1].string), (yyvsp[0].string));
  }
-#line 2121 "grammar.c" /* yacc.c:1646  */
+#line 2138 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 77:
+#line 523 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[0].string);
+ }
+#line 2146 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 78:
+#line 526 "grammar.y" /* yacc.c:1646  */
+    {
+  asprintf(&(yyval.string), "%s%s", (yyvsp[-1].string), (yyvsp[0].string));
+ }
+#line 2154 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 79:
+#line 533 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[0].string);
+ }
+#line 2162 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 80:
+#line 536 "grammar.y" /* yacc.c:1646  */
+    {
+  asprintf(&(yyval.string),"%s%s", (yyvsp[-1].string), (yyvsp[0].string));
+ }
+#line 2170 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 81:
+#line 543 "grammar.y" /* yacc.c:1646  */
+    {
+  (yyval.string) = (yyvsp[0].string);
+ }
+#line 2178 "grammar.c" /* yacc.c:1646  */
+    break;
+
+  case 82:
+#line 546 "grammar.y" /* yacc.c:1646  */
+    {
+  asprintf(&(yyval.string),"%s%s", (yyvsp[-1].string), (yyvsp[0].string));
+ }
+#line 2186 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 490 "grammar.y" /* yacc.c:1646  */
+#line 554 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = NULL;
 }
-#line 2129 "grammar.c" /* yacc.c:1646  */
+#line 2194 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 493 "grammar.y" /* yacc.c:1646  */
+#line 557 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[-1].gen)->code;
   }
-#line 2137 "grammar.c" /* yacc.c:1646  */
+#line 2202 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 500 "grammar.y" /* yacc.c:1646  */
+#line 564 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = if_expression((yyvsp[-2].gen)->name, (yyvsp[-2].gen)->code, (yyvsp[0].string), NULL);
  }
-#line 2145 "grammar.c" /* yacc.c:1646  */
+#line 2210 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 503 "grammar.y" /* yacc.c:1646  */
+#line 567 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = if_expression((yyvsp[-4].gen)->name, (yyvsp[-4].gen)->code, (yyvsp[-2].string), (yyvsp[0].string));
   }
-#line 2153 "grammar.c" /* yacc.c:1646  */
+#line 2218 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 506 "grammar.y" /* yacc.c:1646  */
+#line 570 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression((yyvsp[-6].gen)->code, (yyvsp[-2].gen)->code, (yyvsp[-4].gen), (yyvsp[0].string));
   }
-#line 2161 "grammar.c" /* yacc.c:1646  */
+#line 2226 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 509 "grammar.y" /* yacc.c:1646  */
+#line 573 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression((yyvsp[-5].gen)->code, NULL, (yyvsp[-3].gen), (yyvsp[0].string));
   }
-#line 2169 "grammar.c" /* yacc.c:1646  */
+#line 2234 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 512 "grammar.y" /* yacc.c:1646  */
+#line 576 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression((yyvsp[-5].gen)->code, (yyvsp[-2].gen)->code, NULL, (yyvsp[0].string));
   }
-#line 2177 "grammar.c" /* yacc.c:1646  */
+#line 2242 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 515 "grammar.y" /* yacc.c:1646  */
+#line 579 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression((yyvsp[-4].gen)->code, NULL, NULL, (yyvsp[0].string));
   }
-#line 2185 "grammar.c" /* yacc.c:1646  */
+#line 2250 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 518 "grammar.y" /* yacc.c:1646  */
+#line 582 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression(NULL, (yyvsp[-2].gen)->code, (yyvsp[-4].gen), (yyvsp[0].string));
   }
-#line 2193 "grammar.c" /* yacc.c:1646  */
+#line 2258 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 521 "grammar.y" /* yacc.c:1646  */
+#line 585 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression(NULL, NULL, (yyvsp[-3].gen), (yyvsp[0].string));
   }
-#line 2201 "grammar.c" /* yacc.c:1646  */
+#line 2266 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 524 "grammar.y" /* yacc.c:1646  */
+#line 588 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression(NULL, (yyvsp[-2].gen)->code, NULL, (yyvsp[0].string));
   }
-#line 2209 "grammar.c" /* yacc.c:1646  */
+#line 2274 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 527 "grammar.y" /* yacc.c:1646  */
+#line 591 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression(NULL, NULL, NULL, (yyvsp[0].string));
   }
-#line 2217 "grammar.c" /* yacc.c:1646  */
+#line 2282 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 534 "grammar.y" /* yacc.c:1646  */
+#line 598 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = for_expression(NULL, (yyvsp[-2].gen)->code, NULL, (yyvsp[0].string));
  }
-#line 2225 "grammar.c" /* yacc.c:1646  */
+#line 2290 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 537 "grammar.y" /* yacc.c:1646  */
+#line 601 "grammar.y" /* yacc.c:1646  */
     {
   asprintf(&(yyval.string),"%s", (yyvsp[-5].string));
   asprintf(&(yyval.string),"%s", for_expression(NULL, (yyvsp[-2].gen)->code, NULL, (yyvsp[-5].string)));
  }
-#line 2234 "grammar.c" /* yacc.c:1646  */
+#line 2299 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 545 "grammar.y" /* yacc.c:1646  */
+#line 609 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = return_expression(VOID_T, NULL);
  }
-#line 2242 "grammar.c" /* yacc.c:1646  */
+#line 2307 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 548 "grammar.y" /* yacc.c:1646  */
+#line 612 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = return_expression((yyvsp[-1].gen)->t, (yyvsp[-1].gen)->name);
  }
-#line 2250 "grammar.c" /* yacc.c:1646  */
+#line 2315 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 555 "grammar.y" /* yacc.c:1646  */
+#line 619 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
   printf("%s\n", (yyval.string));
  }
-#line 2259 "grammar.c" /* yacc.c:1646  */
+#line 2324 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 559 "grammar.y" /* yacc.c:1646  */
+#line 623 "grammar.y" /* yacc.c:1646  */
     {
   asprintf(&(yyval.string), "%s%s", (yyvsp[-1].string), (yyvsp[0].string));
   printf("%s\n", (yyval.string));
  }
-#line 2268 "grammar.c" /* yacc.c:1646  */
+#line 2333 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 101:
-#line 567 "grammar.y" /* yacc.c:1646  */
+#line 631 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
  }
-#line 2276 "grammar.c" /* yacc.c:1646  */
+#line 2341 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 102:
-#line 570 "grammar.y" /* yacc.c:1646  */
+#line 634 "grammar.y" /* yacc.c:1646  */
     {
   (yyval.string) = (yyvsp[0].string);
   }
-#line 2284 "grammar.c" /* yacc.c:1646  */
+#line 2349 "grammar.c" /* yacc.c:1646  */
     break;
 
   case 103:
-#line 577 "grammar.y" /* yacc.c:1646  */
+#line 641 "grammar.y" /* yacc.c:1646  */
     {
-  printf("Coucou\n");
   (yyvsp[-1].exp)->t = string_to_type((yyvsp[-2].string));
   (yyvsp[-1].exp)->level = level;
-  add_hash_table((yyvsp[-1].exp));
   switch((yyvsp[-1].exp)->t){
   case INTEGER:
-    asprintf(&(yyval.string),"define i32 @%s(%s){", function_name((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
+    asprintf(&(yyval.string),"define i32 %s(%s){", new_func((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
     break;
   case FLOATING:
-    asprintf(&(yyval.string),"define double @%s(%s){", function_name((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
+    asprintf(&(yyval.string),"define double %s(%s){", new_func((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
     break;
   case VOID_T:
-    asprintf(&(yyval.string),"define void @%s(%s){", function_name((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
+    asprintf(&(yyval.string),"define void %s(%s){", new_func((yyvsp[-1].exp)->name), parameter_to_string((yyvsp[-1].exp)));
     break;
   default:
     printf("Error\n");
@@ -2308,11 +2371,11 @@ yyreduce:
   asprintf(&(yyval.string),"}");
   
  }
-#line 2312 "grammar.c" /* yacc.c:1646  */
+#line 2375 "grammar.c" /* yacc.c:1646  */
     break;
 
 
-#line 2316 "grammar.c" /* yacc.c:1646  */
+#line 2379 "grammar.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2540,7 +2603,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 602 "grammar.y" /* yacc.c:1906  */
+#line 664 "grammar.y" /* yacc.c:1906  */
 
 #include <stdio.h>
 #include <string.h>
@@ -2553,34 +2616,44 @@ extern FILE *yyin;
 char *file_name = NULL;
 
 int yyerror (char *s) {
-    fflush (stdout);
-    fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
-    return 0;
+  fflush (stdout);
+  fprintf (stderr, "%s:%d:%d: %s\n", file_name, yylineno, column, s);
+  return 0;
 }
 
-
 int main (int argc, char *argv[]) {
-  //char *tab[length_hash];
-  hcreate(length_hash);
-    FILE *input = NULL;
-    if (argc==2) {
-	input = fopen (argv[1], "r");
-	file_name = strdup (argv[1]);
-	if (input) {
-	    yyin = input;
-	}
-	else {
-	  fprintf (stderr, "%s: Could not open %s\n", *argv, argv[1]);
-	    return 1;
-	}
+
+  hash_array = calloc(max_hash, sizeof(GHashTable *));
+  hash_array[level] = g_hash_table_new(g_str_hash, g_str_equal);
+  int i = 1;
+  for (; i < max_hash ; ++i)
+    hash_array[i] = NULL;
+  FILE *input = NULL;
+  if (argc==2) {
+    input = fopen (argv[1], "r");
+    file_name = strdup (argv[1]);
+    if (input) {
+      yyin = input;
     }
     else {
-	fprintf (stderr, "%s: error: no input file\n", *argv);
-	return 1;
+      fprintf (stderr, "%s: Could not open %s\n", *argv, argv[1]);
+      return 1;
     }
-    yyparse ();
-    hdestroy();
-    free (file_name);
-    
-    return 0;
+  }
+  else {
+    fprintf (stderr, "%s: error: no input file\n", *argv);
+    return 1;
+  }
+  yyparse ();
+  free (file_name);
+
+  i = 0;
+  for(; i < max_hash ; i++)
+    if(hash_array[i] != NULL){
+      g_hash_table_destroy(hash_array[i]);
+    }
+  free(hash_array);
+
+  
+  return 0;
 }

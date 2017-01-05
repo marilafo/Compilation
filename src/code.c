@@ -88,7 +88,7 @@ char *get_type(char *name, enum type t){
     asprintf(&ret, "double %s", name);
     break;
   default:
-    printf("Error\n");
+    return NULL;
   }
   return ret;
 }
@@ -176,11 +176,12 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
     asprintf(&ret, "call void @%s(%s) noreturn\n", fun, arg);
     break;
   default:
-    printf("Error");
+    return NULL;
   }
   return ret;
 }
     
+/*
 char *load_value(char *res, char* var, enum type t){
   char *ret;
   switch(t){
@@ -191,11 +192,13 @@ char *load_value(char *res, char* var, enum type t){
     asprintf(&ret,"%s = load double, double* %s \n", res, var);
     break;
   default:
-    printf("Error l.80\n");
+    return NULL;
   }
   return ret;
 }
+*/
 
+/*
 char *store_value(char *var, char* ptr, enum type t){
   char *ret;
   switch(t){
@@ -206,11 +209,12 @@ char *store_value(char *var, char* ptr, enum type t){
     asprintf(&ret, "store double %s, double* %s\n", var, ptr);
     break;
   default:
-    printf("Error\n");
+    return NULL;
   }
   return ret;
 	    
 }
+*/
 
 char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
   char *ret;
@@ -246,7 +250,7 @@ char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
     asprintf(&ret,"%s = or i32 %s, %s\n", res, arg1, arg2);
     break;
   default:
-    printf("Error\n");
+    return NULL;
   }
   return ret;
 	
@@ -273,7 +277,7 @@ char *made_op_double(char *res, char *arg1, char *arg2, enum operation_code op){
   case ASS_OP:
     asprintf(&ret,NULL);
     break;
-  case SHL_OP:
+    /*case SHL_OP:
     printf("Error on ne peut pas SHL avec un double\n");
     break;
   case SHR_OP:
@@ -284,9 +288,9 @@ char *made_op_double(char *res, char *arg1, char *arg2, enum operation_code op){
     break;
   case OR_OP:
     printf("Error on ne peut pas OR avec un double\n");
-    break;
+    break;*/
   default:
-    printf("Error\n");
+    return NULL;
 
   }
   return ret;
@@ -314,7 +318,7 @@ char *made_comparison_int(char *res, char *arg1, char *arg2, enum operation_code
     asprintf(&ret,"%s = icmp ne i32 %s, %s", res, arg1, arg2);
     break;
   default:
-    printf("Error\n");
+    return NULL;
   }
   return ret;
 }
@@ -341,7 +345,7 @@ char *made_comparison_double(char *res, char *arg1, char *arg2, enum operation_c
     asprintf(&ret,"%s = fcmp une double %s, %s", res, arg1, arg2);
     break;
   default:
-    printf("Error\n");
+    return NULL;
   }
   return ret;
 }
@@ -358,20 +362,29 @@ struct generation *op_1(char *name, enum operation_code op ){
   //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));
   switch(tmp->t){
   case INTEGER:
-    asprintf(&(ret->code),"%s", made_op_int(ret->name, ret->name, "1", op));    
+    if(made_op_int(ret->name, ret->name, "1", op)==NULL)
+      return NULL;
+    else
+      asprintf(&(ret->code),"%s", made_op_int(ret->name, ret->name, "1", op));    
     break;
   case FLOATING:
-    asprintf(&(ret->code),"%s", made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op));
-    
+    if(made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op) == NULL)
+      return NULL;
+    else
+      asprintf(&(ret->code),"%s", made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op));
+        
     break;
   case VOID_T:
-    printf("++/-- invalide avec type void\n");
+    //printf("++/-- invalide avec type void\n");
+    return NULL;
     break;
   case BOOL_T:
-    printf("++/-- invalide avec type booleen\n");
+    //printf("++/-- invalide avec type booleen\n");
+    return NULL;
     break;
   case NOT_DEFINE:
-    printf("++/-- invalide variable non défini\n");
+    //printf("++/-- invalide variable non défini\n");
+    return NULL;
     break;
   }
   //asprintf(&(ret->code),"%s",store_value(ret->name, tmp->val, tmp->t));
@@ -384,21 +397,34 @@ struct generation *operation_expression(struct generation *a, struct generation 
   if(a->t == INTEGER && b->t == INTEGER){
     ret->t = a->t;
     asprintf(&(ret->code), "%s%s", a->code, b->code);
-    if (made_code == 0)
-      asprintf(&(ret->code), "%s%s",ret->code, made_op_int(ret->name, a->name, b->name ,c));
+    if (made_code == 0){
+      if(made_op_int(ret->name, a->name, b->name ,c) == NULL)
+	return NULL;
+      else
+	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(ret->name, a->name, b->name ,c));
+    }
     else if (made_code == 1)
-      asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(ret->name, a->name, b->name ,c));
+      if(made_comparison_int(ret->name, a->name, b->name ,c) != NULL)
+	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(ret->name, a->name, b->name ,c));
+    return NULL;
   }
   else if (a->t == FLOATING && b->t == FLOATING){
     ret->t = a->t;
     asprintf(&(ret->code), "%s%s", a->code, b->code);
     if(made_code == 0)
-      asprintf(&(ret->code), "%s%s",ret->code, made_op_double(ret->name, a->name, b->name, c));
-    else if (made_code == 1)
-      asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(ret->name, a->name, b->name, c));
+      if(made_op_double(ret->name, a->name, b->name, c) == NULL)
+	return NULL;
+      else
+	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(ret->name, a->name, b->name, c));
+    else if (made_code == 1){
+      if(made_comparison_double(ret->name, a->name, b->name, c) != NULL)
+	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(ret->name, a->name, b->name, c));
+      else 
+	return NULL;
+    }
   }
   else{
-    printf("Error\n");
+    return NULL;
   }
   if(c == L_COMP || c == G_COMP || c == LE_COMP || c == GE_COMP || c == EQ_COMP || c == NE_COMP)
     ret->t = BOOL_T;
@@ -454,7 +480,7 @@ char *return_expression(enum type t, char* var){
   case VOID_T:
     asprintf(&ret,"ret void");
   default:
-    printf("Error\n");
+    return NULL;
   }
  
   return ret;
@@ -503,7 +529,7 @@ char *parameter_to_string(struct expression *e){
     case FLOATING:
       asprintf(&ret,", double %s",param->name); 
     default:
-      printf("Error : type problem in parameter\n");
+      return NULL;
     }    
   }
   return ret;

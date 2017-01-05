@@ -60,7 +60,9 @@ logical_or_expression
   $$ = $1;
  }
 | logical_or_expression OR logical_and_expression{
-  $$ = operation_expression($1, $3, OR_OP, 0);
+  if(operation_expression($1, $3, OR_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, OR_OP, 0);
+  else yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 ;
 
@@ -70,7 +72,10 @@ logical_and_expression
   $$ = $1;
  }
 | logical_and_expression AND comparison_expression{
-  $$ = operation_expression($1, $3, AND_OP, 0);
+  if(operation_expression($1, $3, AND_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, AND_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 ;
 
@@ -80,10 +85,16 @@ shift_expression
   $$ = $1;
  }
 | shift_expression SHL additive_expression{
-  $$ = operation_expression($1, $3, SHL_OP, 0);
+  if(operation_expression($1, $3, SHL_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, SHL_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | shift_expression SHR additive_expression{
-  $$ = operation_expression($1, $3, SHR_OP, 0);
+  if(operation_expression($1, $3, SHR_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, SHR_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 ;
 
@@ -129,7 +140,10 @@ primary_expression
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->last_id = NULL;
-  asprintf(&($$->code), "%s",call_function($$->name, tmp->val, "", tmp->t));
+  if(call_function($$->name, tmp->val, "", tmp->t) != NULL)
+    asprintf(&($$->code), "%s",call_function($$->name, tmp->val, "", tmp->t));
+  else 
+    yyerror("Type non pris en compte");
   }
 | IDENTIFIER '(' argument_expression_list ')'{
   //printf("%s\n", $1);
@@ -147,7 +161,10 @@ primary_expression
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->last_id = NULL;
-  asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
+  if(call_function($$->name, tmp->val, $3, tmp->t)==NULL)
+    asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
+  else
+    yyerror("Type non pris en compte");
   }
 ;
 
@@ -158,21 +175,33 @@ postfix_expression
  }
 | IDENTIFIER INC_OP {
   //printf("%s\n", $1);
-  $$ = op_1($1,ADD_OP);
+  if(op_1($1,ADD_OP) != NULL)
+    $$ = op_1($1,ADD_OP);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | IDENTIFIER DEC_OP{
   //printf("%s\n", $1);
-  $$ = op_1($1,SUB_OP);
+  if(op_1($1,SUB_OP) != NULL)
+    $$ = op_1($1,SUB_OP);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 ;
 
 //DOING
 argument_expression_list
 : expression{
-  asprintf(&$$,"%s",get_type($1->name, $1->t));
+  if(get_type($1->name, $1->t)!=NULL)
+    asprintf(&$$,"%s",get_type($1->name, $1->t));
+  else
+    yyerror("Type non pris en compte");
  }
 | argument_expression_list ',' expression{
-  asprintf(&$$,"%s, %s",$1, get_type($3->name, $3->t));
+  if(get_type($3->name, $3->t)!=NULL)
+    asprintf(&$$,"%s, %s",$1, get_type($3->name, $3->t));
+  else 
+    yyerror("Type non pris en compte");
   }
 ;
 //DOING
@@ -182,11 +211,17 @@ unary_expression
  }
 | INC_OP IDENTIFIER {
   printf("%s\n",$2);
-  $$ = op_1($2, ADD_OP);
+  if(op_1($2, ADD_OP) != NULL)
+    $$ = op_1($2, ADD_OP);
+  else 
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | DEC_OP IDENTIFIER{
   printf("%s\n",$2);
-  $$ = op_1($2, SUB_OP);
+  if(op_1($2, SUB_OP) != NULL)
+    $$ = op_1($2, SUB_OP);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | unary_operator unary_expression{
   $$ = malloc(sizeof(struct generation));
@@ -216,13 +251,22 @@ multiplicative_expression
   $$ = $1;
  }
 | multiplicative_expression '*' unary_expression {
-  $$ = operation_expression($1, $3, MUL_OP, 0);
+  if(operation_expression($1, $3, MUL_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, MUL_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 | multiplicative_expression '/' unary_expression{
-  $$ = operation_expression($1, $3, DIV_OP, 0);
+  if(operation_expression($1, $3, DIV_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, DIV_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 | multiplicative_expression REM unary_expression{
-  $$ = operation_expression($1, $3, REM_OP, 0);
+  if(operation_expression($1, $3, REM_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, REM_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 ;
 
@@ -232,10 +276,16 @@ additive_expression
   $$ = $1;
  }
 | additive_expression '+' multiplicative_expression{
-  $$ = operation_expression($1, $3, ADD_OP, 0);
+  if(operation_expression($1, $3, ADD_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, ADD_OP, 0);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 | additive_expression '-' multiplicative_expression{
-  $$ = operation_expression($1, $3, SUB_OP, 0);
+  if(operation_expression($1, $3, SUB_OP, 0) != NULL)
+    $$ = operation_expression($1, $3, SUB_OP, 0);
+  else 
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 ;
 
@@ -245,30 +295,52 @@ comparison_expression
   $$ = $1;
  }
 | comparison_expression '<' shift_expression{
-  $$ = operation_expression($1, $3, L_COMP, 1);
+  if(operation_expression($1, $3, L_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, L_COMP, 1);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 | comparison_expression '>' shift_expression{
-  $$ = operation_expression($1, $3, G_COMP, 1);
+  if(operation_expression($1, $3, G_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, G_COMP, 1);
+  else
+  yyerror("Operation non prise en compte, Type et operation non compatibles");
   }
 | comparison_expression LE_OP shift_expression{
-  $$ = operation_expression($1, $3, LE_COMP, 1);
+  if(operation_expression($1, $3, LE_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, LE_COMP, 1);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles"); 
  }
 | comparison_expression GE_OP shift_expression{
-  $$ = operation_expression($1, $3, GE_COMP, 1);
+  if(operation_expression($1, $3, GE_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, GE_COMP, 1);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles"); 
  }
 | comparison_expression EQ_OP shift_expression{
-  $$ = operation_expression($1, $3, EQ_COMP, 1);
+  if(operation_expression($1, $3, EQ_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, EQ_COMP, 1);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles"); 
  }
 | comparison_expression NE_OP shift_expression{
-  $$ = operation_expression($1, $3, NE_COMP, 1);
+  if(operation_expression($1, $3, NE_COMP, 1) != NULL)
+    $$ = operation_expression($1, $3, NE_COMP, 1);
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles"); 
  }
 ;
 
 //DOING
 expression
 : unary_expression assignment_operator conditional_expression{
-  $$ = operation_expression($1, $3, string_to_op_code($2), 0);
-  asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
+  if(operation_expression($1, $3, string_to_op_code($2), 0) != NULL){
+    $$ = operation_expression($1, $3, string_to_op_code($2), 0);
+    asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
+  }
+  else
+    yyerror("Operation non prise en compte, Type et operation non compatibles"); 
  }
 | conditional_expression{
   $$ = $1;
@@ -621,10 +693,16 @@ iteration_statement
 //DOING
 jump_statement
 : RETURN ';'{
-  $$ = return_expression(VOID_T, NULL);
+  if(return_expression(VOID_T, NULL) != NULL)
+    $$ = return_expression(VOID_T, NULL);
+  else
+    yyerror("Type non pris en compte");
  }
 | RETURN expression ';'{
-  $$ = return_expression($2->t, $2->name);
+  if(return_expression($2->t, $2->name) != NULL)
+    $$ = return_expression($2->t, $2->name);
+  else
+    yyerror("Type non pris en compte");
  }
 ;
 
@@ -657,13 +735,22 @@ function_definition
   $2->level = level;
   switch($2->t){
   case INTEGER:
-    asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    if(parameter_to_string($2) != NULL)
+      asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    else
+      yyerror("Type non pris en compte");
     break;
   case FLOATING:
-    asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    if(parameter_to_string($2) != NULL)
+      asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    else
+      yyerror("Type non pris en compte");
     break;
   case VOID_T:
-    asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    if(parameter_to_string($2) != NULL)
+      asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
+    else
+      yyerror("Type non pris en compte");
     break;
   default:
     printf("Error\n");

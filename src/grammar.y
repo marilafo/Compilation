@@ -9,6 +9,8 @@
   //A enlever quand on aura les listes
   //int tab = 0;
   //int p = 0;
+
+  char *code;
   
   extern int yylineno;
   int yylex ();
@@ -88,7 +90,7 @@ shift_expression
 //DOING
 primary_expression
 : IDENTIFIER {
-  printf("%s\n",$1);
+  //printf("%s\n",$1);
   tmp = action_identifier($1);
   $$ = malloc(sizeof(struct generation));
   $$->name = tmp->val;
@@ -96,8 +98,7 @@ primary_expression
   $$->code = NULL;
   $$->last_id = $1;
   //asprintf(&($$->code), "%s", $$->name);
-  //printf("%s", $$->name);
-      
+  //printf("%s", $$->name);      
  }
 | CONSTANTI  {
   $$ = malloc(sizeof(struct generation));
@@ -115,23 +116,27 @@ primary_expression
   $$ = $2;
   }
 | IDENTIFIER '(' ')' {
-  printf("%s\n",$1);
+  //printf("%s\n",$1);
+  //printf("Contenu hash table\n");
+  //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
   tmp = map_with_name(new_func($1));
   //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
-  }
-    
+  }    
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->last_id = NULL;
-  asprintf(&($$->code), "%s", call_function($$->name, tmp->val, "", tmp->t));
+  asprintf(&($$->code), "%s",call_function($$->name, tmp->val, "", tmp->t));
   }
 | IDENTIFIER '(' argument_expression_list ')'{
-  printf("%s\n", $1);
+  //printf("%s\n", $1);
+  //printf("Contenu hash table\n");
+  //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
+  printf("mapping %s\n", new_func($1));
   tmp = map_with_name(new_func($1));
   //faire la vérif de type
   if(tmp == NULL){
@@ -152,11 +157,11 @@ postfix_expression
   $$ = $1;
  }
 | IDENTIFIER INC_OP {
-  printf("%s\n", $1);
+  //printf("%s\n", $1);
   $$ = op_1($1,ADD_OP);
  }
 | IDENTIFIER DEC_OP{
-  printf("%s\n", $1);
+  //printf("%s\n", $1);
   $$ = op_1($1,SUB_OP);
  }
 ;
@@ -167,8 +172,7 @@ argument_expression_list
   asprintf(&$$,"%s",get_type($1->name, $1->t));
  }
 | argument_expression_list ',' expression{
-  asprintf(&$$, "%s, ", $1);
-  asprintf(&$$,"%s",get_type($3->name, $3->t));
+  asprintf(&$$,"%s, %s",$1, get_type($3->name, $3->t));
   }
 ;
 //DOING
@@ -185,16 +189,15 @@ unary_expression
   $$ = op_1($2, SUB_OP);
  }
 | unary_operator unary_expression{
+  $$ = malloc(sizeof(struct generation));
   $$->name = new_var();
   $$->t = $2->t;
   switch($$->t){
   case INTEGER :
-    asprintf(&($$->code),"%s", $2->code);
-    asprintf(&($$->code),"%s = sub i32 0, %s\n", $$->name, $2->name);
+    asprintf(&($$->code),"%s%s = sub i32 0, %s\n",$2->code, $$->name, $2->name);
     break;
   case FLOATING:
-    asprintf(&($$->code),"%s", $2->code);
-    asprintf(&($$->code),"%s = fsub double %s, %s\n", $$->name, double_to_hex_str(0.0), $2->name);
+    asprintf(&($$->code),"%s%s = fsub double %s, %s\n",$2->code, $$->name, double_to_hex_str(0.0), $2->name);
     break;
   default:
     printf("Error l.278\n");
@@ -265,7 +268,7 @@ comparison_expression
 expression
 : unary_expression assignment_operator conditional_expression{
   $$ = operation_expression($1, $3, string_to_op_code($2), 0);
-  asprintf(&($$->code), "%s",store_value($3->name, $1->name, $$->t)); 
+  asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
  }
 | conditional_expression{
   $$ = $1;
@@ -358,7 +361,9 @@ function_declarator
 : declarator '(' parameter_list ')'{
   $$ = $1;
   init_function($$, new_func($$->name), last_type, $3);
-
+  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
+    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  //Sinon vérification de param
   int i = 0;
   for(; i < length_llist($3); ++i){
     tmp = look_for($3, i);
@@ -377,6 +382,9 @@ function_declarator
   }
  }
 | declarator '(' ')'{
+  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
+    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  //Sinon vérification de param
   $$ = $1;
   init_function($$,new_func($$->name), last_type, NULL);
   }
@@ -387,7 +395,7 @@ function_declarator
 //GENERATION CODE
 declarator
 : IDENTIFIER {
-  printf("%s\n",$1);
+  //printf("%s\n",$1);
   $$ = create_non_init_exp($1);
  }
 | '(' declarator ')'{
@@ -395,7 +403,11 @@ declarator
   }
 | declarator '(' parameter_list ')'{
     $$ = $1;
+    
     init_function($$, new_func($$->name), last_type, $3);
+    if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
+      g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+    //Sinon vérification de param
     int i = 0;
     for(; i < length_llist($3); ++i){
       tmp = look_for($3, i);
@@ -414,6 +426,9 @@ declarator
 | declarator '(' ')'{
   $$ = $1;
   init_function($$, new_func($$->name), last_type, NULL);
+  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
+    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  //Sinon vérification de param
   }
 ;
   
@@ -599,8 +614,7 @@ iteration_statement
   $$ = for_expression(NULL, $3->code, NULL, $5);
  }
 | DO statement WHILE '(' expression ')' ';'{
-  asprintf(&$$,"%s", $2);
-  asprintf(&$$,"%s", for_expression(NULL, $5->code, NULL, $2));
+  asprintf(&$$,"%s%s", $2,for_expression(NULL, $5->code, NULL, $2));
  }
 ;
 
@@ -618,11 +632,11 @@ jump_statement
 program
 : external_declaration{
   $$ = $1;
-  printf("%s\n", $$);
+  code = $$;
  }
 | program external_declaration{
   asprintf(&$$, "%s%s", $1, $2);
-  printf("%s\n", $$);
+  code = $$;
  }
 ;
 
@@ -643,20 +657,23 @@ function_definition
   $2->level = level;
   switch($2->t){
   case INTEGER:
-    asprintf(&$$,"define i32 %s(%s){", new_func($2->name), parameter_to_string($2));
+    asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
     break;
   case FLOATING:
-    asprintf(&$$,"define double %s(%s){", new_func($2->name), parameter_to_string($2));
+    asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
     break;
   case VOID_T:
-    asprintf(&$$,"define void %s(%s){", new_func($2->name), parameter_to_string($2));
+    asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
     break;
   default:
     printf("Error\n");
   }
- 
-  asprintf(&$$,"%s", $3);
-  asprintf(&$$,"}");
+
+  
+  asprintf(&$$,"%s%s",$$, $3);  
+  asprintf(&$$,"%s}\n",$$);
+
+
   
  }
 ;
@@ -702,6 +719,7 @@ int main (int argc, char *argv[]) {
     return 1;
   }
   yyparse ();
+  printf("%s\n", code);
   free (file_name);
 
   i = 0;

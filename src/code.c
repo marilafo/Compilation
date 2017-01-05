@@ -114,7 +114,7 @@ struct expression *map_symbol(char *name, enum type t){
 struct expression *map_with_name(char *name){
  struct expression *old;
   int i = level;
-  for(; i > 0; --i){
+  for(; i >= 0; --i){
     if( g_hash_table_contains(hash_array[i], name)){
       old = g_hash_table_lookup(hash_array[i], name);
       return old;
@@ -126,6 +126,11 @@ struct expression *map_with_name(char *name){
   }
   return NULL;
 }
+
+void print_hash(gpointer key, gpointer value, gpointer user_data){
+  printf("key :%s\n",(char *)key);
+}
+  
 
 void value(gpointer key, gpointer value, gpointer user_data){
   struct expression *old;
@@ -378,19 +383,19 @@ struct generation *operation_expression(struct generation *a, struct generation 
   ret->name = new_var();
   if(a->t == INTEGER && b->t == INTEGER){
     ret->t = a->t;
-    asprintf(&(ret->code), "%s%s", a->code, a->code);
+    asprintf(&(ret->code), "%s%s", a->code, b->code);
     if (made_code == 0)
-      asprintf(&(ret->code), "%s", made_op_int(ret->name, a->name, b->name ,c));
+      asprintf(&(ret->code), "%s%s",ret->code, made_op_int(ret->name, a->name, b->name ,c));
     else if (made_code == 1)
-      asprintf(&(ret->code), "%s", made_comparison_int(ret->name, a->name, b->name ,c));
+      asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(ret->name, a->name, b->name ,c));
   }
   else if (a->t == FLOATING && b->t == FLOATING){
     ret->t = a->t;
     asprintf(&(ret->code), "%s%s", a->code, b->code);
     if(made_code == 0)
-      asprintf(&(ret->code), "%s",made_op_double(ret->name, a->name, b->name, c));
+      asprintf(&(ret->code), "%s%s",ret->code, made_op_double(ret->name, a->name, b->name, c));
     else if (made_code == 1)
-      asprintf(&(ret->code), "%s",made_comparison_double(ret->name, a->name, b->name, c));
+      asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(ret->name, a->name, b->name, c));
   }
   else{
     printf("Error\n");
@@ -405,12 +410,10 @@ char * if_expression(char *var, char *cond, char *t, char *f){
   char *l_t = new_label();
   char *l_f = new_label();
   asprintf(&ret, "%s", cond);
-  asprintf(&ret, "br i1 %s, label %%%s, label %%%s\n", var, l_t, l_f);
-  asprintf(&ret, "%s:\n", l_t);
-  asprintf(&ret, "%s", t);
-
-  asprintf(&ret, "%s:\n", l_f);
-  asprintf(&ret, "%s\n", f);
+  asprintf(&ret, "%sbr i1 %s, label %%%s, label %%%s\n",ret, var, l_t, l_f);
+  asprintf(&ret, "%s%s:\n%s", ret, l_t,t);
+  asprintf(&ret, "%s%s:\n",ret, l_f);
+  asprintf(&ret, "%s%s\n", ret,f);
   return ret;
 }
 
@@ -420,22 +423,22 @@ char * for_expression(char *init, char *inc, struct generation *cond, char * b){
   char *fin = new_label();
   asprintf(&ret, "%s", init);
   if(cond == NULL)
-    asprintf(&ret, "br label %%%s\n", boucle);
+    asprintf(&ret, "%sbr label %%%s\n",ret, boucle);
   else
-    asprintf(&ret, "br i1 %s label %%%s, label %%%s\n", cond->name, boucle, fin);
+    asprintf(&ret, "%sbr i1 %s label %%%s, label %%%s\n", ret, cond->name, boucle, fin);
     
-  asprintf(&ret, "%s:\n",boucle);
-  asprintf(&ret, "%s", b);
-  asprintf(&ret, "%s", inc);
+  asprintf(&ret, "%s%s:\n",ret, boucle);
+  asprintf(&ret, "%s%s", ret, b);
+  asprintf(&ret, "%s%s", ret,inc);
   if (cond != NULL)
-    asprintf(&ret, "%s", cond->code);
+    asprintf(&ret, "%s%s", ret, cond->code);
 
   if(cond == NULL)
-    asprintf(&ret, "br label %%%s\n", boucle);
+    asprintf(&ret, "%sbr label %%%s\n",ret, boucle);
   else
-    asprintf(&ret, "br i1 %s label %%%s, label %%%s\n", cond->name, boucle, fin);
+    asprintf(&ret, "%sbr i1 %s label %%%s, label %%%s\n", ret, cond->name, boucle, fin);
 
-  asprintf(&ret, "%s:\n", fin);
+  asprintf(&ret, "%s%s:\n", ret, fin);
   return ret;
 }
 
@@ -478,11 +481,11 @@ enum operation_code string_to_op_code(char *s){
 }
 
 enum type string_to_type(char *s){
-  if(strcmp("int", s))
+  if(strcmp("int", s) == 0)
     return INTEGER;
-  if(strcmp("double", s))
+  if(strcmp("double", s) == 0)
     return FLOATING;
-  if(strcmp("void", s))
+  if(strcmp("void", s) == 0)
     return VOID_T;
   return -1;
 }

@@ -9,7 +9,6 @@ struct generation{
   char *code;
   enum type t;
   char *name;
-  char *last_id;
 };
 
 char *err;
@@ -92,22 +91,31 @@ char *get_type(char *name, enum type t){
   }
   return ret;
 }
+
+void print_hash(gpointer key, gpointer value, gpointer user_data){
+  printf("key :%s\n",(char *)key);
+}
+  
+
 struct expression *map_symbol(char *name, enum type t){
   struct expression *old;
   int i = level;
   for(; i > 0; --i){
+    printf("Hash level %d:\n", i);
+    g_hash_table_foreach(hash_array[i], print_hash, NULL);
+    printf("\n");
+    if(i == 0){
+      if (g_hash_table_contains(hash_array[i], new_param(name))){
+	old = g_hash_table_lookup(hash_array[i], new_param(name));
+	return old;
+      }
+    }
     if( g_hash_table_contains(hash_array[i], name)){
       old = g_hash_table_lookup(hash_array[i], name);
       if(old->t == t)
 	return old;
     }
-    else if (g_hash_table_contains(hash_array[i], new_param(name))){
-      old = g_hash_table_lookup(hash_array[i], new_param(name));
-      if(old->t == t)
-	return old;
-    }
-  }
-    
+  } 
   return NULL;
 }
 
@@ -115,22 +123,24 @@ struct expression *map_with_name(char *name){
  struct expression *old;
   int i = level;
   for(; i >= 0; --i){
+    printf("Hash level %d:\n", i);
+    g_hash_table_foreach(hash_array[i], print_hash, NULL);
+    printf("\n");
+    if(i == 0){
+      if (g_hash_table_contains(hash_array[i], new_param(name))){
+	old = g_hash_table_lookup(hash_array[i], new_param(name));
+	return old;
+      }
+    }
     if( g_hash_table_contains(hash_array[i], name)){
       old = g_hash_table_lookup(hash_array[i], name);
-      return old;
-    }
-    else if (g_hash_table_contains(hash_array[i], new_param(name))){
-      old = g_hash_table_lookup(hash_array[i], new_param(name));
       return old;
     }
   }
   return NULL;
 }
 
-void print_hash(gpointer key, gpointer value, gpointer user_data){
-  printf("key :%s\n",(char *)key);
-}
-  
+
 
 void value(gpointer key, gpointer value, gpointer user_data){
   struct expression *old;
@@ -153,9 +163,13 @@ struct expression * action_identifier(char *name){
     //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
   }
   else{
-    tmp = map_with_name(name);
-    if(tmp==NULL)
+    ret = map_with_name(name);
+    //printf("%s :%s, %d\n", ret->val, ret->name, ret->t);
+    if(ret==NULL){
       t = last_type;
+    }
+    else
+      t = ret->t;
     ret = create_exp(name, new_var(), t, -1);
     g_hash_table_insert(hash_array[level], name, ret);
   }
@@ -358,7 +372,6 @@ struct generation *op_1(char *name, enum operation_code op ){
   tmp = action_identifier(name);
   ret->name = tmp->val;    
   ret->t = tmp->t;
-  ret->last_id = name;
   //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));
   switch(tmp->t){
   case INTEGER:
@@ -394,10 +407,13 @@ struct generation *op_1(char *name, enum operation_code op ){
 struct generation *operation_expression(struct generation *a, struct generation *b, enum operation_code c, int made_code){
   struct generation *ret = malloc(sizeof(struct generation));
   ret->name = new_var();
+  //printf("Type a : %d\n", a->t);
+  //printf("Type b : %d\n", b->t);
   if(a->t == INTEGER && b->t == INTEGER){
     ret->t = a->t;
     asprintf(&(ret->code), "%s%s", a->code, b->code);
     if (made_code == 0){
+      printf("Tout vas bien\n");
       if(made_op_int(ret->name, a->name, b->name ,c) == NULL)
 	return NULL;
       else

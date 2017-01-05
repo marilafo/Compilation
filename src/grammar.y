@@ -107,7 +107,6 @@ primary_expression
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->code = NULL;
-  $$->last_id = $1;
   //asprintf(&($$->code), "%s", $$->name);
   //printf("%s", $$->name);      
  }
@@ -139,7 +138,6 @@ primary_expression
   }    
   $$->name = tmp->val;
   $$->t = tmp->t;
-  $$->last_id = NULL;
   if(call_function($$->name, tmp->val, "", tmp->t) != NULL)
     asprintf(&($$->code), "%s",call_function($$->name, tmp->val, "", tmp->t));
   else 
@@ -150,7 +148,7 @@ primary_expression
   //printf("Contenu hash table\n");
   //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
-  printf("mapping %s\n", new_func($1));
+  //printf("mapping %s\n", new_func($1));
   tmp = map_with_name(new_func($1));
   //faire la vérif de type
   if(tmp == NULL){
@@ -160,7 +158,6 @@ primary_expression
     
   $$->name = tmp->val;
   $$->t = tmp->t;
-  $$->last_id = NULL;
   if(call_function($$->name, tmp->val, $3, tmp->t)==NULL)
     asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
   else
@@ -210,14 +207,14 @@ unary_expression
   $$ = $1;
  }
 | INC_OP IDENTIFIER {
-  printf("%s\n",$2);
+  //printf("%s\n",$2);
   if(op_1($2, ADD_OP) != NULL)
     $$ = op_1($2, ADD_OP);
   else 
     yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | DEC_OP IDENTIFIER{
-  printf("%s\n",$2);
+  //printf("%s\n",$2);
   if(op_1($2, SUB_OP) != NULL)
     $$ = op_1($2, SUB_OP);
   else
@@ -235,7 +232,7 @@ unary_expression
     asprintf(&($$->code),"%s%s = fsub double %s, %s\n",$2->code, $$->name, double_to_hex_str(0.0), $2->name);
     break;
   default:
-    printf("Error l.278\n");
+    yyerror("Impossible de rendre négatif, type incompatible");
   }
  }
 ;
@@ -254,7 +251,7 @@ multiplicative_expression
   if(operation_expression($1, $3, MUL_OP, 0) != NULL)
     $$ = operation_expression($1, $3, MUL_OP, 0);
   else
-    yyerror("Operation non prise en compte, Type et operation non compatibles");
+    yyerror("Operation non prise en compte, Type et operation non compatibles test");
   }
 | multiplicative_expression '/' unary_expression{
   if(operation_expression($1, $3, DIV_OP, 0) != NULL)
@@ -337,7 +334,7 @@ expression
 : unary_expression assignment_operator conditional_expression{
   if(operation_expression($1, $3, string_to_op_code($2), 0) != NULL){
     $$ = operation_expression($1, $3, string_to_op_code($2), 0);
-    asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
+    //asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
   }
   else
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
@@ -387,7 +384,7 @@ declaration
     tmp->t = string_to_type($1);
     tmp->level = level;
     if(g_hash_table_contains(hash_array[level], tmp->name))
-      printf("Erreur : rédéclaration de la variable %s", tmp->name);
+      yyerror(&err, "Redéclaration de la variable %s", tmp->name);
     else
       g_hash_table_insert(hash_array[level], tmp->name, tmp);
   }
@@ -534,6 +531,8 @@ parameter_list
 parameter_declaration
 : type_name declarator{
   $$ = $2;
+  init_exp($$, new_param($$->name), string_to_type($1), level);
+  //printf("Dec : %s, %d, %s\n", $2->val, $2->t, $2->name);
  }
 ;
 
@@ -753,7 +752,8 @@ function_definition
       yyerror("Type non pris en compte");
     break;
   default:
-    printf("Error\n");
+    yyerror("Type booléen ou non défini ne peuvent pas etre le type de retour d'une fonction");
+    //printf("Error\n");
   }
 
   

@@ -536,16 +536,16 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    52,    52,    59,    62,    71,    74,    84,    87,    93,
-     103,   114,   120,   126,   129,   148,   173,   176,   183,   194,
-     200,   209,   212,   219,   226,   245,   250,   253,   259,   265,
-     275,   278,   284,   294,   297,   303,   309,   315,   321,   327,
-     337,   345,   352,   355,   358,   361,   364,   367,   370,   373,
-     380,   402,   407,   415,   419,   423,   433,   456,   469,   473,
-     476,   498,   523,   527,   535,   542,   545,   548,   551,   554,
-     560,   577,   586,   590,   593,   600,   603,   610,   613,   620,
-     623,   630,   633,   640,   644,   651,   654,   657,   660,   663,
-     666,   669,   672,   675,   678,   685,   688,   695,   701,   711,
-     715,   723,   726,   733
+     103,   113,   119,   125,   128,   146,   170,   173,   180,   191,
+     197,   206,   209,   216,   223,   242,   247,   250,   256,   262,
+     272,   275,   281,   291,   294,   300,   306,   312,   318,   324,
+     334,   342,   349,   352,   355,   358,   361,   364,   367,   370,
+     377,   399,   404,   412,   416,   420,   430,   453,   466,   470,
+     473,   495,   520,   524,   532,   541,   544,   547,   550,   553,
+     559,   576,   585,   589,   592,   599,   602,   609,   612,   619,
+     622,   629,   632,   639,   643,   650,   653,   656,   659,   662,
+     665,   668,   671,   674,   677,   684,   687,   694,   700,   710,
+     714,   722,   725,   732
 };
 #endif
 
@@ -1675,7 +1675,6 @@ yyreduce:
   (yyval.gen)->name = tmp->val;
   (yyval.gen)->t = tmp->t;
   (yyval.gen)->code = NULL;
-  (yyval.gen)->last_id = (yyvsp[(1) - (1)].string);
   //asprintf(&($$->code), "%s", $$->name);
   //printf("%s", $$->name);      
  }
@@ -1683,7 +1682,7 @@ yyreduce:
 
   case 11:
 /* Line 1792 of yacc.c  */
-#line 114 "grammar.y"
+#line 113 "grammar.y"
     {
   (yyval.gen) = malloc(sizeof(struct generation));
   (yyval.gen)->name = new_var();
@@ -1694,7 +1693,7 @@ yyreduce:
 
   case 12:
 /* Line 1792 of yacc.c  */
-#line 120 "grammar.y"
+#line 119 "grammar.y"
     {
   (yyval.gen) = malloc(sizeof(struct generation));
   (yyval.gen)->name = new_var();
@@ -1705,7 +1704,7 @@ yyreduce:
 
   case 13:
 /* Line 1792 of yacc.c  */
-#line 126 "grammar.y"
+#line 125 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(2) - (3)].gen);
   }
@@ -1713,7 +1712,7 @@ yyreduce:
 
   case 14:
 /* Line 1792 of yacc.c  */
-#line 129 "grammar.y"
+#line 128 "grammar.y"
     {
   //printf("%s\n",$1);
   //printf("Contenu hash table\n");
@@ -1727,7 +1726,6 @@ yyreduce:
   }    
   (yyval.gen)->name = tmp->val;
   (yyval.gen)->t = tmp->t;
-  (yyval.gen)->last_id = NULL;
   if(call_function((yyval.gen)->name, tmp->val, "", tmp->t) != NULL)
     asprintf(&((yyval.gen)->code), "%s",call_function((yyval.gen)->name, tmp->val, "", tmp->t));
   else 
@@ -1737,13 +1735,13 @@ yyreduce:
 
   case 15:
 /* Line 1792 of yacc.c  */
-#line 148 "grammar.y"
+#line 146 "grammar.y"
     {
   //printf("%s\n", $1);
   //printf("Contenu hash table\n");
   //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   (yyval.gen) = malloc(sizeof(struct generation));
-  printf("mapping %s\n", new_func((yyvsp[(1) - (4)].string)));
+  //printf("mapping %s\n", new_func($1));
   tmp = map_with_name(new_func((yyvsp[(1) - (4)].string)));
   //faire la vérif de type
   if(tmp == NULL){
@@ -1753,7 +1751,6 @@ yyreduce:
     
   (yyval.gen)->name = tmp->val;
   (yyval.gen)->t = tmp->t;
-  (yyval.gen)->last_id = NULL;
   if(call_function((yyval.gen)->name, tmp->val, (yyvsp[(3) - (4)].string), tmp->t)==NULL)
     asprintf(&((yyval.gen)->code), "%s", call_function((yyval.gen)->name, tmp->val, (yyvsp[(3) - (4)].string), tmp->t));
   else
@@ -1763,7 +1760,7 @@ yyreduce:
 
   case 16:
 /* Line 1792 of yacc.c  */
-#line 173 "grammar.y"
+#line 170 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
  }
@@ -1771,7 +1768,7 @@ yyreduce:
 
   case 17:
 /* Line 1792 of yacc.c  */
-#line 176 "grammar.y"
+#line 173 "grammar.y"
     {
   //printf("%s\n", $1);
   if(op_1((yyvsp[(1) - (2)].string),ADD_OP) != NULL)
@@ -1783,7 +1780,7 @@ yyreduce:
 
   case 18:
 /* Line 1792 of yacc.c  */
-#line 183 "grammar.y"
+#line 180 "grammar.y"
     {
   //printf("%s\n", $1);
   if(op_1((yyvsp[(1) - (2)].string),SUB_OP) != NULL)
@@ -1795,7 +1792,7 @@ yyreduce:
 
   case 19:
 /* Line 1792 of yacc.c  */
-#line 194 "grammar.y"
+#line 191 "grammar.y"
     {
   if(get_type((yyvsp[(1) - (1)].gen)->name, (yyvsp[(1) - (1)].gen)->t)!=NULL)
     asprintf(&(yyval.string),"%s",get_type((yyvsp[(1) - (1)].gen)->name, (yyvsp[(1) - (1)].gen)->t));
@@ -1806,7 +1803,7 @@ yyreduce:
 
   case 20:
 /* Line 1792 of yacc.c  */
-#line 200 "grammar.y"
+#line 197 "grammar.y"
     {
   if(get_type((yyvsp[(3) - (3)].gen)->name, (yyvsp[(3) - (3)].gen)->t)!=NULL)
     asprintf(&(yyval.string),"%s, %s",(yyvsp[(1) - (3)].string), get_type((yyvsp[(3) - (3)].gen)->name, (yyvsp[(3) - (3)].gen)->t));
@@ -1817,7 +1814,7 @@ yyreduce:
 
   case 21:
 /* Line 1792 of yacc.c  */
-#line 209 "grammar.y"
+#line 206 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
  }
@@ -1825,9 +1822,9 @@ yyreduce:
 
   case 22:
 /* Line 1792 of yacc.c  */
-#line 212 "grammar.y"
+#line 209 "grammar.y"
     {
-  printf("%s\n",(yyvsp[(2) - (2)].string));
+  //printf("%s\n",$2);
   if(op_1((yyvsp[(2) - (2)].string), ADD_OP) != NULL)
     (yyval.gen) = op_1((yyvsp[(2) - (2)].string), ADD_OP);
   else 
@@ -1837,9 +1834,9 @@ yyreduce:
 
   case 23:
 /* Line 1792 of yacc.c  */
-#line 219 "grammar.y"
+#line 216 "grammar.y"
     {
-  printf("%s\n",(yyvsp[(2) - (2)].string));
+  //printf("%s\n",$2);
   if(op_1((yyvsp[(2) - (2)].string), SUB_OP) != NULL)
     (yyval.gen) = op_1((yyvsp[(2) - (2)].string), SUB_OP);
   else
@@ -1849,7 +1846,7 @@ yyreduce:
 
   case 24:
 /* Line 1792 of yacc.c  */
-#line 226 "grammar.y"
+#line 223 "grammar.y"
     {
   (yyval.gen) = malloc(sizeof(struct generation));
   (yyval.gen)->name = new_var();
@@ -1862,14 +1859,14 @@ yyreduce:
     asprintf(&((yyval.gen)->code),"%s%s = fsub double %s, %s\n",(yyvsp[(2) - (2)].gen)->code, (yyval.gen)->name, double_to_hex_str(0.0), (yyvsp[(2) - (2)].gen)->name);
     break;
   default:
-    printf("Error l.278\n");
+    yyerror("Impossible de rendre négatif, type incompatible");
   }
  }
     break;
 
   case 26:
 /* Line 1792 of yacc.c  */
-#line 250 "grammar.y"
+#line 247 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
  }
@@ -1877,18 +1874,18 @@ yyreduce:
 
   case 27:
 /* Line 1792 of yacc.c  */
-#line 253 "grammar.y"
+#line 250 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), MUL_OP, 0) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), MUL_OP, 0);
   else
-    yyerror("Operation non prise en compte, Type et operation non compatibles");
+    yyerror("Operation non prise en compte, Type et operation non compatibles test");
   }
     break;
 
   case 28:
 /* Line 1792 of yacc.c  */
-#line 259 "grammar.y"
+#line 256 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), DIV_OP, 0) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), DIV_OP, 0);
@@ -1899,7 +1896,7 @@ yyreduce:
 
   case 29:
 /* Line 1792 of yacc.c  */
-#line 265 "grammar.y"
+#line 262 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), REM_OP, 0) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), REM_OP, 0);
@@ -1910,7 +1907,7 @@ yyreduce:
 
   case 30:
 /* Line 1792 of yacc.c  */
-#line 275 "grammar.y"
+#line 272 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
  }
@@ -1918,7 +1915,7 @@ yyreduce:
 
   case 31:
 /* Line 1792 of yacc.c  */
-#line 278 "grammar.y"
+#line 275 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), ADD_OP, 0) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), ADD_OP, 0);
@@ -1929,7 +1926,7 @@ yyreduce:
 
   case 32:
 /* Line 1792 of yacc.c  */
-#line 284 "grammar.y"
+#line 281 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), SUB_OP, 0) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), SUB_OP, 0);
@@ -1940,7 +1937,7 @@ yyreduce:
 
   case 33:
 /* Line 1792 of yacc.c  */
-#line 294 "grammar.y"
+#line 291 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
  }
@@ -1948,7 +1945,7 @@ yyreduce:
 
   case 34:
 /* Line 1792 of yacc.c  */
-#line 297 "grammar.y"
+#line 294 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), L_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), L_COMP, 1);
@@ -1959,7 +1956,7 @@ yyreduce:
 
   case 35:
 /* Line 1792 of yacc.c  */
-#line 303 "grammar.y"
+#line 300 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), G_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), G_COMP, 1);
@@ -1970,7 +1967,7 @@ yyreduce:
 
   case 36:
 /* Line 1792 of yacc.c  */
-#line 309 "grammar.y"
+#line 306 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), LE_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), LE_COMP, 1);
@@ -1981,7 +1978,7 @@ yyreduce:
 
   case 37:
 /* Line 1792 of yacc.c  */
-#line 315 "grammar.y"
+#line 312 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), GE_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), GE_COMP, 1);
@@ -1992,7 +1989,7 @@ yyreduce:
 
   case 38:
 /* Line 1792 of yacc.c  */
-#line 321 "grammar.y"
+#line 318 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), EQ_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), EQ_COMP, 1);
@@ -2003,7 +2000,7 @@ yyreduce:
 
   case 39:
 /* Line 1792 of yacc.c  */
-#line 327 "grammar.y"
+#line 324 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), NE_COMP, 1) != NULL)
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), NE_COMP, 1);
@@ -2014,11 +2011,11 @@ yyreduce:
 
   case 40:
 /* Line 1792 of yacc.c  */
-#line 337 "grammar.y"
+#line 334 "grammar.y"
     {
   if(operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), string_to_op_code((yyvsp[(2) - (3)].string)), 0) != NULL){
     (yyval.gen) = operation_expression((yyvsp[(1) - (3)].gen), (yyvsp[(3) - (3)].gen), string_to_op_code((yyvsp[(2) - (3)].string)), 0);
-    asprintf(&((yyval.gen)->code), "%s%s",(yyval.gen)->code,store_value((yyvsp[(3) - (3)].gen)->name, (yyvsp[(1) - (3)].gen)->name, (yyval.gen)->t)); 
+    //asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t)); 
   }
   else
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
@@ -2027,7 +2024,7 @@ yyreduce:
 
   case 41:
 /* Line 1792 of yacc.c  */
-#line 345 "grammar.y"
+#line 342 "grammar.y"
     {
   (yyval.gen) = (yyvsp[(1) - (1)].gen);
   }
@@ -2035,7 +2032,7 @@ yyreduce:
 
   case 42:
 /* Line 1792 of yacc.c  */
-#line 352 "grammar.y"
+#line 349 "grammar.y"
     {
   (yyval.string) = "ass";
  }
@@ -2043,7 +2040,7 @@ yyreduce:
 
   case 43:
 /* Line 1792 of yacc.c  */
-#line 355 "grammar.y"
+#line 352 "grammar.y"
     {
   (yyval.string) = "mul";
   }
@@ -2051,7 +2048,7 @@ yyreduce:
 
   case 44:
 /* Line 1792 of yacc.c  */
-#line 358 "grammar.y"
+#line 355 "grammar.y"
     {
   (yyval.string) = "div";
   }
@@ -2059,7 +2056,7 @@ yyreduce:
 
   case 45:
 /* Line 1792 of yacc.c  */
-#line 361 "grammar.y"
+#line 358 "grammar.y"
     {
   (yyval.string) = "rem";
   }
@@ -2067,7 +2064,7 @@ yyreduce:
 
   case 46:
 /* Line 1792 of yacc.c  */
-#line 364 "grammar.y"
+#line 361 "grammar.y"
     {
   (yyval.string) = "shl";
   }
@@ -2075,7 +2072,7 @@ yyreduce:
 
   case 47:
 /* Line 1792 of yacc.c  */
-#line 367 "grammar.y"
+#line 364 "grammar.y"
     {
   (yyval.string) = "shr";
   }
@@ -2083,7 +2080,7 @@ yyreduce:
 
   case 48:
 /* Line 1792 of yacc.c  */
-#line 370 "grammar.y"
+#line 367 "grammar.y"
     {
   (yyval.string) = "add";
   }
@@ -2091,7 +2088,7 @@ yyreduce:
 
   case 49:
 /* Line 1792 of yacc.c  */
-#line 373 "grammar.y"
+#line 370 "grammar.y"
     {
   (yyval.string) = "sub";
   }
@@ -2099,7 +2096,7 @@ yyreduce:
 
   case 50:
 /* Line 1792 of yacc.c  */
-#line 380 "grammar.y"
+#line 377 "grammar.y"
     {
   int length_l = length_llist((yyvsp[(2) - (3)].list));
   
@@ -2110,7 +2107,7 @@ yyreduce:
     tmp->t = string_to_type((yyvsp[(1) - (3)].string));
     tmp->level = level;
     if(g_hash_table_contains(hash_array[level], tmp->name))
-      printf("Erreur : rédéclaration de la variable %s", tmp->name);
+      yyerror(&err, "Redéclaration de la variable %s", tmp->name);
     else
       g_hash_table_insert(hash_array[level], tmp->name, tmp);
   }
@@ -2120,7 +2117,7 @@ yyreduce:
 
   case 51:
 /* Line 1792 of yacc.c  */
-#line 402 "grammar.y"
+#line 399 "grammar.y"
     {
   (yyval.list) = init_llist();
   add_llist((yyval.list), (yyvsp[(1) - (1)].exp));
@@ -2129,7 +2126,7 @@ yyreduce:
 
   case 52:
 /* Line 1792 of yacc.c  */
-#line 407 "grammar.y"
+#line 404 "grammar.y"
     {
   (yyval.list) = (yyvsp[(1) - (3)].list);
   add_llist((yyval.list), (yyvsp[(3) - (3)].exp));
@@ -2138,7 +2135,7 @@ yyreduce:
 
   case 53:
 /* Line 1792 of yacc.c  */
-#line 415 "grammar.y"
+#line 412 "grammar.y"
     {
   (yyval.string) = "void";
   last_type = VOID_T;
@@ -2147,7 +2144,7 @@ yyreduce:
 
   case 54:
 /* Line 1792 of yacc.c  */
-#line 419 "grammar.y"
+#line 416 "grammar.y"
     {
   (yyval.string) = "int";
   last_type = INTEGER;
@@ -2156,7 +2153,7 @@ yyreduce:
 
   case 55:
 /* Line 1792 of yacc.c  */
-#line 423 "grammar.y"
+#line 420 "grammar.y"
     {
   (yyval.string) = "double";
   last_type = FLOATING;
@@ -2165,7 +2162,7 @@ yyreduce:
 
   case 56:
 /* Line 1792 of yacc.c  */
-#line 433 "grammar.y"
+#line 430 "grammar.y"
     {
   (yyval.exp) = (yyvsp[(1) - (4)].exp);
   init_function((yyval.exp), new_func((yyval.exp)->name), last_type, (yyvsp[(3) - (4)].list));
@@ -2193,7 +2190,7 @@ yyreduce:
 
   case 57:
 /* Line 1792 of yacc.c  */
-#line 456 "grammar.y"
+#line 453 "grammar.y"
     {
   if(!g_hash_table_contains(hash_array[level], new_func((yyvsp[(1) - (3)].exp)->name)))
     g_hash_table_insert(hash_array[level], new_func((yyvsp[(1) - (3)].exp)->name), (yyval.exp));
@@ -2205,7 +2202,7 @@ yyreduce:
 
   case 58:
 /* Line 1792 of yacc.c  */
-#line 469 "grammar.y"
+#line 466 "grammar.y"
     {
   //printf("%s\n",$1);
   (yyval.exp) = create_non_init_exp((yyvsp[(1) - (1)].string));
@@ -2214,7 +2211,7 @@ yyreduce:
 
   case 59:
 /* Line 1792 of yacc.c  */
-#line 473 "grammar.y"
+#line 470 "grammar.y"
     {
   (yyval.exp) = (yyvsp[(2) - (3)].exp);
   }
@@ -2222,7 +2219,7 @@ yyreduce:
 
   case 60:
 /* Line 1792 of yacc.c  */
-#line 476 "grammar.y"
+#line 473 "grammar.y"
     {
     (yyval.exp) = (yyvsp[(1) - (4)].exp);
     
@@ -2249,7 +2246,7 @@ yyreduce:
 
   case 61:
 /* Line 1792 of yacc.c  */
-#line 498 "grammar.y"
+#line 495 "grammar.y"
     {
   (yyval.exp) = (yyvsp[(1) - (3)].exp);
   init_function((yyval.exp), new_func((yyval.exp)->name), last_type, NULL);
@@ -2261,7 +2258,7 @@ yyreduce:
 
   case 62:
 /* Line 1792 of yacc.c  */
-#line 523 "grammar.y"
+#line 520 "grammar.y"
     {
   (yyval.list) = init_llist();
   add_llist((yyval.list), (yyvsp[(1) - (1)].exp));
@@ -2270,7 +2267,7 @@ yyreduce:
 
   case 63:
 /* Line 1792 of yacc.c  */
-#line 527 "grammar.y"
+#line 524 "grammar.y"
     {
   (yyval.list) = (yyvsp[(1) - (3)].list);
   add_llist((yyval.list), (yyvsp[(3) - (3)].exp));
@@ -2279,15 +2276,17 @@ yyreduce:
 
   case 64:
 /* Line 1792 of yacc.c  */
-#line 535 "grammar.y"
+#line 532 "grammar.y"
     {
   (yyval.exp) = (yyvsp[(2) - (2)].exp);
+  init_exp((yyval.exp), new_param((yyval.exp)->name), string_to_type((yyvsp[(1) - (2)].string)), level);
+  //printf("Dec : %s, %d, %s\n", $2->val, $2->t, $2->name);
  }
     break;
 
   case 65:
 /* Line 1792 of yacc.c  */
-#line 542 "grammar.y"
+#line 541 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2295,7 +2294,7 @@ yyreduce:
 
   case 66:
 /* Line 1792 of yacc.c  */
-#line 545 "grammar.y"
+#line 544 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   }
@@ -2303,7 +2302,7 @@ yyreduce:
 
   case 67:
 /* Line 1792 of yacc.c  */
-#line 548 "grammar.y"
+#line 547 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   }
@@ -2311,7 +2310,7 @@ yyreduce:
 
   case 68:
 /* Line 1792 of yacc.c  */
-#line 551 "grammar.y"
+#line 550 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   }
@@ -2319,7 +2318,7 @@ yyreduce:
 
   case 69:
 /* Line 1792 of yacc.c  */
-#line 554 "grammar.y"
+#line 553 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   }
@@ -2327,7 +2326,7 @@ yyreduce:
 
   case 70:
 /* Line 1792 of yacc.c  */
-#line 560 "grammar.y"
+#line 559 "grammar.y"
     {
   level++;
   if(level >= max_hash){
@@ -2346,7 +2345,7 @@ yyreduce:
 
   case 71:
 /* Line 1792 of yacc.c  */
-#line 577 "grammar.y"
+#line 576 "grammar.y"
     {
   g_hash_table_foreach(hash_array[level], value, NULL);
   
@@ -2356,7 +2355,7 @@ yyreduce:
 
   case 72:
 /* Line 1792 of yacc.c  */
-#line 586 "grammar.y"
+#line 585 "grammar.y"
     {
   (yyval.string) = NULL;
   
@@ -2365,7 +2364,7 @@ yyreduce:
 
   case 73:
 /* Line 1792 of yacc.c  */
-#line 590 "grammar.y"
+#line 589 "grammar.y"
     {
   (yyval.string) = (yyvsp[(2) - (3)].string);
  }
@@ -2373,7 +2372,7 @@ yyreduce:
 
   case 74:
 /* Line 1792 of yacc.c  */
-#line 593 "grammar.y"
+#line 592 "grammar.y"
     {
   (yyval.string) = (yyvsp[(2) - (3)].string);
  }
@@ -2381,7 +2380,7 @@ yyreduce:
 
   case 75:
 /* Line 1792 of yacc.c  */
-#line 600 "grammar.y"
+#line 599 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2389,7 +2388,7 @@ yyreduce:
 
   case 76:
 /* Line 1792 of yacc.c  */
-#line 603 "grammar.y"
+#line 602 "grammar.y"
     {
   asprintf(&(yyval.string),"%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
  }
@@ -2397,7 +2396,7 @@ yyreduce:
 
   case 77:
 /* Line 1792 of yacc.c  */
-#line 610 "grammar.y"
+#line 609 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2405,7 +2404,7 @@ yyreduce:
 
   case 78:
 /* Line 1792 of yacc.c  */
-#line 613 "grammar.y"
+#line 612 "grammar.y"
     {
   asprintf(&(yyval.string), "%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
  }
@@ -2413,7 +2412,7 @@ yyreduce:
 
   case 79:
 /* Line 1792 of yacc.c  */
-#line 620 "grammar.y"
+#line 619 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2421,7 +2420,7 @@ yyreduce:
 
   case 80:
 /* Line 1792 of yacc.c  */
-#line 623 "grammar.y"
+#line 622 "grammar.y"
     {
   asprintf(&(yyval.string),"%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
  }
@@ -2429,7 +2428,7 @@ yyreduce:
 
   case 81:
 /* Line 1792 of yacc.c  */
-#line 630 "grammar.y"
+#line 629 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2437,7 +2436,7 @@ yyreduce:
 
   case 82:
 /* Line 1792 of yacc.c  */
-#line 633 "grammar.y"
+#line 632 "grammar.y"
     {
   asprintf(&(yyval.string),"%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
  }
@@ -2445,7 +2444,7 @@ yyreduce:
 
   case 83:
 /* Line 1792 of yacc.c  */
-#line 641 "grammar.y"
+#line 640 "grammar.y"
     {
   (yyval.string) = NULL;
 }
@@ -2453,7 +2452,7 @@ yyreduce:
 
   case 84:
 /* Line 1792 of yacc.c  */
-#line 644 "grammar.y"
+#line 643 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (2)].gen)->code;
   }
@@ -2461,7 +2460,7 @@ yyreduce:
 
   case 85:
 /* Line 1792 of yacc.c  */
-#line 651 "grammar.y"
+#line 650 "grammar.y"
     {
   (yyval.string) = if_expression((yyvsp[(3) - (5)].gen)->name, (yyvsp[(3) - (5)].gen)->code, (yyvsp[(5) - (5)].string), NULL);
  }
@@ -2469,7 +2468,7 @@ yyreduce:
 
   case 86:
 /* Line 1792 of yacc.c  */
-#line 654 "grammar.y"
+#line 653 "grammar.y"
     {
   (yyval.string) = if_expression((yyvsp[(3) - (7)].gen)->name, (yyvsp[(3) - (7)].gen)->code, (yyvsp[(5) - (7)].string), (yyvsp[(7) - (7)].string));
   }
@@ -2477,7 +2476,7 @@ yyreduce:
 
   case 87:
 /* Line 1792 of yacc.c  */
-#line 657 "grammar.y"
+#line 656 "grammar.y"
     {
   (yyval.string) = for_expression((yyvsp[(3) - (9)].gen)->code, (yyvsp[(7) - (9)].gen)->code, (yyvsp[(5) - (9)].gen), (yyvsp[(9) - (9)].string));
   }
@@ -2485,7 +2484,7 @@ yyreduce:
 
   case 88:
 /* Line 1792 of yacc.c  */
-#line 660 "grammar.y"
+#line 659 "grammar.y"
     {
   (yyval.string) = for_expression((yyvsp[(3) - (8)].gen)->code, NULL, (yyvsp[(5) - (8)].gen), (yyvsp[(8) - (8)].string));
   }
@@ -2493,7 +2492,7 @@ yyreduce:
 
   case 89:
 /* Line 1792 of yacc.c  */
-#line 663 "grammar.y"
+#line 662 "grammar.y"
     {
   (yyval.string) = for_expression((yyvsp[(3) - (8)].gen)->code, (yyvsp[(6) - (8)].gen)->code, NULL, (yyvsp[(8) - (8)].string));
   }
@@ -2501,7 +2500,7 @@ yyreduce:
 
   case 90:
 /* Line 1792 of yacc.c  */
-#line 666 "grammar.y"
+#line 665 "grammar.y"
     {
   (yyval.string) = for_expression((yyvsp[(3) - (7)].gen)->code, NULL, NULL, (yyvsp[(7) - (7)].string));
   }
@@ -2509,7 +2508,7 @@ yyreduce:
 
   case 91:
 /* Line 1792 of yacc.c  */
-#line 669 "grammar.y"
+#line 668 "grammar.y"
     {
   (yyval.string) = for_expression(NULL, (yyvsp[(6) - (8)].gen)->code, (yyvsp[(4) - (8)].gen), (yyvsp[(8) - (8)].string));
   }
@@ -2517,7 +2516,7 @@ yyreduce:
 
   case 92:
 /* Line 1792 of yacc.c  */
-#line 672 "grammar.y"
+#line 671 "grammar.y"
     {
   (yyval.string) = for_expression(NULL, NULL, (yyvsp[(4) - (7)].gen), (yyvsp[(7) - (7)].string));
   }
@@ -2525,7 +2524,7 @@ yyreduce:
 
   case 93:
 /* Line 1792 of yacc.c  */
-#line 675 "grammar.y"
+#line 674 "grammar.y"
     {
   (yyval.string) = for_expression(NULL, (yyvsp[(5) - (7)].gen)->code, NULL, (yyvsp[(7) - (7)].string));
   }
@@ -2533,7 +2532,7 @@ yyreduce:
 
   case 94:
 /* Line 1792 of yacc.c  */
-#line 678 "grammar.y"
+#line 677 "grammar.y"
     {
   (yyval.string) = for_expression(NULL, NULL, NULL, (yyvsp[(6) - (6)].string));
   }
@@ -2541,7 +2540,7 @@ yyreduce:
 
   case 95:
 /* Line 1792 of yacc.c  */
-#line 685 "grammar.y"
+#line 684 "grammar.y"
     {
   (yyval.string) = for_expression(NULL, (yyvsp[(3) - (5)].gen)->code, NULL, (yyvsp[(5) - (5)].string));
  }
@@ -2549,7 +2548,7 @@ yyreduce:
 
   case 96:
 /* Line 1792 of yacc.c  */
-#line 688 "grammar.y"
+#line 687 "grammar.y"
     {
   asprintf(&(yyval.string),"%s%s", (yyvsp[(2) - (7)].string),for_expression(NULL, (yyvsp[(5) - (7)].gen)->code, NULL, (yyvsp[(2) - (7)].string)));
  }
@@ -2557,7 +2556,7 @@ yyreduce:
 
   case 97:
 /* Line 1792 of yacc.c  */
-#line 695 "grammar.y"
+#line 694 "grammar.y"
     {
   if(return_expression(VOID_T, NULL) != NULL)
     (yyval.string) = return_expression(VOID_T, NULL);
@@ -2568,7 +2567,7 @@ yyreduce:
 
   case 98:
 /* Line 1792 of yacc.c  */
-#line 701 "grammar.y"
+#line 700 "grammar.y"
     {
   if(return_expression((yyvsp[(2) - (3)].gen)->t, (yyvsp[(2) - (3)].gen)->name) != NULL)
     (yyval.string) = return_expression((yyvsp[(2) - (3)].gen)->t, (yyvsp[(2) - (3)].gen)->name);
@@ -2579,7 +2578,7 @@ yyreduce:
 
   case 99:
 /* Line 1792 of yacc.c  */
-#line 711 "grammar.y"
+#line 710 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   code = (yyval.string);
@@ -2588,7 +2587,7 @@ yyreduce:
 
   case 100:
 /* Line 1792 of yacc.c  */
-#line 715 "grammar.y"
+#line 714 "grammar.y"
     {
   asprintf(&(yyval.string), "%s%s", (yyvsp[(1) - (2)].string), (yyvsp[(2) - (2)].string));
   code = (yyval.string);
@@ -2597,7 +2596,7 @@ yyreduce:
 
   case 101:
 /* Line 1792 of yacc.c  */
-#line 723 "grammar.y"
+#line 722 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
  }
@@ -2605,7 +2604,7 @@ yyreduce:
 
   case 102:
 /* Line 1792 of yacc.c  */
-#line 726 "grammar.y"
+#line 725 "grammar.y"
     {
   (yyval.string) = (yyvsp[(1) - (1)].string);
   }
@@ -2613,7 +2612,7 @@ yyreduce:
 
   case 103:
 /* Line 1792 of yacc.c  */
-#line 733 "grammar.y"
+#line 732 "grammar.y"
     {
   (yyvsp[(2) - (3)].exp)->t = string_to_type((yyvsp[(1) - (3)].string));
   (yyvsp[(2) - (3)].exp)->level = level;
@@ -2637,7 +2636,8 @@ yyreduce:
       yyerror("Type non pris en compte");
     break;
   default:
-    printf("Error\n");
+    yyerror("Type booléen ou non défini ne peuvent pas etre le type de retour d'une fonction");
+    //printf("Error\n");
   }
 
   

@@ -35,7 +35,6 @@ void init_function(struct expression *e, char *val, enum type t, struct llist *l
 
 
 
-
 struct llist *init_llist(){
   struct llist *l = malloc(sizeof(struct llist));
   l->first = NULL;
@@ -96,6 +95,36 @@ void parcours(llist liste)
     ;//operation a faire
     temp = temp->next;
   }
-  }*/
+}*/
 
+// /!\ attention ne marche que si fonction est bien de la forme "name_func"
+/*char *name_func(char *fonction){
+  char * copy;
+  int l=strlen(fonction);
+  int i=0;
+  for(;i<l-5;i++)
+    copy[i]=fonction[i];
+  copy[l-5]='\0';
+  return copy;    
+}
+*/
 
+void parcours_arguments(char *arguments){
+  int i=0,j,k;
+  int l=strlen(arguments);
+  
+  for(;i<l;i=k+1){
+    for(j=i;arguments[j] != ' ';j++)//type de la variable
+      printf("%c",arguments[j]);
+    for(k=j+1;arguments[k] != ',' && k < l;k++)//nom de la variable
+      printf("%c",arguments[k]);
+  }
+}
+
+void free_expression(struct expression *e){
+  free(e);
+}
+
+void free_llist(struct llist *l){
+  free(l);
+}

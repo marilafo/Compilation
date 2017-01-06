@@ -122,9 +122,19 @@ void parcours_arguments(char *arguments){
 }
 
 void free_expression(struct expression *e){
+  if(e->param != NULL)
+    free_llist(e->param);
+  e->param=NULL;
   free(e);
 }
 
 void free_llist(struct llist *l){
-  free(l);
+  int i=0;
+  while(first->next != NULL){
+    tmp = first->next;
+    first->next=tmp->next;
+    tmp->next=NULL;
+    free_expression(tmp->val);
+  }
+  free(first);
 }

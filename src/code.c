@@ -46,9 +46,6 @@ enum operation_code{
 
 GHashTable ** hash_array;
 
-struct expression *tmp;
-
-
 
 //Function to create a new var with a correct name
 char *new_var(){
@@ -157,7 +154,6 @@ void value(gpointer key, gpointer value, gpointer user_data){
 
 struct expression * action_identifier(char *name){
   struct expression *ret;
-  enum type t;
   if(g_hash_table_contains(hash_array[level], name)){
     ret = g_hash_table_lookup(hash_array[level], name);
     //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
@@ -366,22 +362,24 @@ char *made_comparison_double(char *res, char *arg1, char *arg2, enum operation_c
 
 struct generation *op_1(char *name, enum operation_code op ){
   struct generation *ret = malloc (sizeof(struct generation));
-  tmp = action_identifier(name);
-  ret->name = tmp->val;    
+  struct expression *tmp = action_identifier(name);
+  ret->name = tmp->val;
   ret->t = tmp->t;
-  //asprintf(&(ret->code),"%s", load_value(ret->name, tmp->val, tmp->t));
+  char *tmp_var = new_var();
+  char *ret_var = new_var();
+  asprintf(&(ret->code),"%s", load_value(tmp_var, tmp->val, tmp->t));
   switch(tmp->t){
   case INTEGER:
-    if(made_op_int(ret->name, ret->name, "1", op)==NULL)
+    if(made_op_int(ret_var, tmp_var, "1", op)==NULL)
       return NULL;
     else
-      asprintf(&(ret->code),"%s", made_op_int(ret->name, ret->name, "1", op));    
+      asprintf(&(ret->code),"%s%s", ret->code, made_op_int(ret_var, tmp_var, "1", op));    
     break;
   case FLOATING:
-    if(made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op) == NULL)
+    if(made_op_double(ret_var, tmp_var ,double_to_hex_str(1.0),op) == NULL)
       return NULL;
     else
-      asprintf(&(ret->code),"%s", made_op_double(ret->name, ret->name,double_to_hex_str(1.0),op));
+      asprintf(&(ret->code),"%s%s", ret->code, made_op_double(ret_var, tmp_var,double_to_hex_str(1.0),op));
         
     break;
   case VOID_T:
@@ -397,9 +395,10 @@ struct generation *op_1(char *name, enum operation_code op ){
     return NULL;
     break;
   }
-  //asprintf(&(ret->code),"%s",store_value(ret->name, tmp->val, tmp->t));
+  asprintf(&(ret->code),"%s%s",ret->code, store_value(ret_var, ret->name, tmp->t));
   return ret;
 }
+
 
 void insert_previous_exp(struct generation *ret, struct generation *a, struct generation *b){
    if(a->code != NULL){
@@ -412,12 +411,14 @@ void insert_previous_exp(struct generation *ret, struct generation *a, struct ge
 	asprintf(&(ret->code),"%s", b->code);
 }
 
+
+
 struct generation *operation_expression(struct generation *a, struct generation *b, enum operation_code c, int made_code){
   struct generation *ret = malloc(sizeof(struct generation));
   ret->code = NULL;
-  char *var_a;
-  char *var_b;
-  char *var_res;
+  char *var_a = new_var();
+  char *var_b = new_var();
+  char *var_res = new_var();
   ret->name = new_var();
   //printf("Type a : %d\n", a->t); 
   //printf("Type b : %d\n", b->t);
@@ -434,20 +435,21 @@ struct generation *operation_expression(struct generation *a, struct generation 
       asprintf(&(ret->code), "%s%s", load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
     else
       asprintf(&(ret->code), "%s%s%s", ret->code, load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
+    
     if (made_code == 0){
       if(made_op_int(var_res, var_a, var_b, c) == NULL)
 	return NULL;
       else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(var_res, var_a, var_b, c));
 	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
-	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER));
       }
     }
     else if (made_code == 1){
       if(made_comparison_int(var_res, var_a, var_b ,c) != NULL){
 	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(var_res, var_a, var_b ,c));
 	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
-	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER));
       }
       else
 	return NULL;
@@ -468,14 +470,14 @@ struct generation *operation_expression(struct generation *a, struct generation 
       else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(var_res, var_a, var_b, c));
 	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
-	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING)
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING));
 	return ret;
       }
     else if (made_code == 1){
-      if(made_comparison_double(var_ret, var_a, var_b, c) != NULL){
-	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(var_ret, var_a, var_b, c));
+      if(made_comparison_double(var_res, var_a, var_b, c) != NULL){
+	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(var_res, var_a, var_b, c));
 	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
-	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING)
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING));
 	return ret;
       }
       else 
@@ -489,6 +491,8 @@ struct generation *operation_expression(struct generation *a, struct generation 
     ret->t = BOOL_T;
   return ret;
 }
+
+
 
 char * if_expression(char *var, char *cond, char *t, char *f){
   char *ret;
@@ -545,6 +549,7 @@ char *return_expression(enum type t, char* var){
   return ret;
 }
 
+ 
 enum operation_code string_to_op_code(char *s){
   if(strcmp("ass", s) == 0)
     return ASS_OP;
@@ -616,4 +621,90 @@ void remove_param_hash_table(struct expression *e){
     param = look_for(e->param, i);
     g_hash_table_remove(hash_array[level],param->name);
   }
+}
+
+
+char * alloca_param(struct expression *fun){
+  struct expression *param;
+  int i = 0;
+  char *ret = NULL; 
+  for (; i < fun->size_param ; ++i){
+    param = look_for(fun->param, i);
+    switch (param->t){
+    case INTEGER:
+      if (ret == NULL)
+	asprintf(&ret, "%s = alloca i32\n", param->val);
+      else
+	asprintf(&ret, "%s%s = alloca i32\n", ret, param->val);      
+      break;
+      
+    case FLOATING:
+      if(ret == NULL)
+	asprintf(&ret, "%s = alloca double\n", param->val);
+      else
+	asprintf(&ret, "%s%s = alloca double\n", ret, param->val);
+      break;
+    default:
+      return NULL;
+    }
+  }
+  return ret;
+}
+
+void insert_declaration(struct GHashTable * hash){
+  struct expression *createCanvas = create_non_init_exp(new_func("createCanvas"));
+  struct llist *param = init_llist();
+  add_llist(param, double_param("a"));
+  add_llist(param, double_param("b"));
+  init_function(createCanvas, "@createCanvas", VOID_T, param);
+
+
+  struct expression *background = create_non_init_exp(new_func("createCanvas"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(background, "@background", VOID_T, param);
+
+  
+  struct expression *fill = create_non_init_exp(new_func("fill"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(fill, "@fill", VOID_T, param);
+
+   
+  struct expression *stroke = create_non_init_exp(new_func("stroke"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(stroke, "@stroke", VOID_T, param);
+
+  struct expression *point = create_non_init_exp(new_func("point"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  add_llist(param, double_param("b"));
+  init_function(point, "@point", VOID_T, param);
+  
+  struct expression *line = create_non_init_exp(new_func("line"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  add_llist(param, double_param("b"));
+  add_llist(param, double_param("c"));
+  add_llist(param, double_param("d"));
+  init_function(line, "@line", VOID_T, param);
+
+  struct expression *ellipse = create_non_init_exp(new_func("ellipse"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  add_llist(param, double_param("b"));
+  add_llist(param, double_param("c"));
+  add_llist(param, double_param("d"));
+  init_function(ellipse, "@ellipse", VOID_T, param);
+
+  
+  
+
+
+}
+
+struct expression * double_param(char *name){
+  struct expression * d = create_exp(name, new_param(name), FLOATING, 0);
+  return d;
 }

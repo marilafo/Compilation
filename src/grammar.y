@@ -100,7 +100,7 @@ shift_expression
 primary_expression
 : IDENTIFIER {
   //printf("%s\n",$1);
-  tmp = action_identifier($1);
+  struct expression *tmp = action_identifier($1);
   $$ = malloc(sizeof(struct generation));
   $$->name = tmp->val;
   $$->t = tmp->t;
@@ -135,16 +135,19 @@ primary_expression
   //printf("Contenu hash table\n");
   //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
-  tmp = map_with_name(new_func($1));
+  struct expression tmp = map_with_name(new_func($1));
   //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
   }    
   $$->name = tmp->val;
+  char *tmp_var = new_var();
   $$->t = tmp->t;
-  if(call_function($$->name, tmp->val, "", tmp->t) != NULL)
-    asprintf(&($$->code), "%s",call_function($$->name, tmp->val, "", tmp->t));
+  if(call_function(tmp_var, tmp->val, "", tmp->t) != NULL){
+    asprintf(&($$->code), "%s",call_function(tmp_var, tmp->val, "", tmp->t));
+    asprintf(&($$->code), "%s%s", $$->code, store_value(tmp_var, $$->name, tmp->t));
+  }
   else 
     yyerror("Type non pris en compte");
   }
@@ -153,21 +156,67 @@ primary_expression
   //printf("Contenu hash table\n");
   //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
+  $$->code = NULL;
   //printf("mapping %s\n", new_func($1));
-  tmp = map_with_name(new_func($1));
+  struct expression *tmp = map_with_name(new_func($1));
+  
   //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
   }
-    
+
+  struct expression *param;
+  int i = 0;
+  char *tmp_var;
+  char * l_param = NULL;
+  for (; i < tmp->size_param ; ++i){
+    param = look_for(tmp->param, i);
+    tmp_var = new_var();
+    switch (param->t){
+    case INTEGER:
+      
+      if ($$->code == NULL)
+	asprintf(&($$->code), "%s", load_value(tmp_var, param->val, INTEGER));
+      else
+	asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, param->val, INTEGER));
+      
+      if(l_param == NULL)
+	asprintf(&l_param,"i32 %s",tmp_var);
+      else
+	asprintf(&l_param,"%s, i32 %s", l_param, tmp_var);
+      
+      break;
+      
+    case FLOATING:
+      if($$->code == NULL)
+	asprintf(&($$->code), "%s", load_value(tmp_var, param->val, FLOATING));
+      else
+	asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, param->val, FLOATING));
+      
+      if(l_param == NULL)
+	asprintf(&l_param,"double %s",tmp_var);
+      else
+	asprintf(&l_param,"%s, double %s", l_param, tmp_var);
+      break;
+    default:
+      yyerror("Incompatible type de paramètre\n");
+    }
+  }
+  
   $$->name = tmp->val;
+  tmp_var = new_var();
   $$->t = tmp->t;
   //printf("%d\n",$$->t);
   //printf("%s\n", $$->name);
   
-  if(call_function($$->name, tmp->val, $3, tmp->t) != NULL)
-    asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
+  if(call_function(tmp_var, tmp->val, l_param, tmp->t) != NULL){
+    if($$->code != NULL)
+      asprintf(&($$->code), "%s%s",$$->code, call_function(tmp_var, tmp->val, l_param, tmp->t));
+    else
+      asprintf(&($$->code), "%s",call_function(tmp_var, tmp->val, l_param, tmp->t));
+    asprintf(&($$->code), "%s%s", $$->code, store_value(tmp_var, $$->name, $$->t));
+  }
   else
     yyerror("Type non pris en compte");
   }
@@ -464,6 +513,7 @@ function_declarator
 : declarator '(' parameter_list ')'{
   $$ = $1;
   init_function($$, new_func($$->name), last_type, $3);
+  struct expression *tmp;
   if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
     g_hash_table_insert(hash_array[level], new_func($1->name), $$);
   //Sinon vérification de param
@@ -508,7 +558,7 @@ declarator
   }
 | declarator '(' parameter_list ')'{
     $$ = $1;
-    
+    struct expression *tmp;
     init_function($$, new_func($$->name), last_type, $3);
     if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
       g_hash_table_insert(hash_array[level], new_func($1->name), $$);
@@ -778,13 +828,22 @@ function_definition
 : type_name function_declarator compound_statement{
   $2->t = string_to_type($1);
   $2->level = level;
+  char *p_alloc;
   switch($2->t){
+    
   case INTEGER:
     if(parameter_to_string($2) != NULL || $2->param == NULL)
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
-      else
-	asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
+      else{
+	p_alloc = alloca_param($2);
+	if(p_alloc != NULL){
+	  asprintf(&$$,"%s", p_alloc);
+	  asprintf(&$$,"%sdefine i32 %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	}
+	else
+	  yyerror("Invalide type de parametre");
+      }
     else
       yyerror("Type non pris en compte");
     break;
@@ -792,8 +851,15 @@ function_definition
     if(parameter_to_string($2) != NULL || $2->param == NULL)
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
-      else
-	asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
+      else{
+	p_alloc = alloca_param($2);
+	if(p_alloc != NULL){
+	  asprintf(&$$,"%s", p_alloc);
+	  asprintf(&$$,"%sdefine double %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	}
+	else
+	  yyerror("Invalide type de parametre");
+      }
     else
       yyerror("Type non pris en compte");
     break;
@@ -801,8 +867,15 @@ function_definition
     if(parameter_to_string($2) != NULL || $2->param == NULL )
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
-      else
-	asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
+      else{
+	p_alloc = alloca_param($2);
+	if(p_alloc != NULL){
+	  asprintf(&$$,"%s", p_alloc);
+	  asprintf(&$$,"%sdefine void %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	}
+	else
+	  yyerror("Invalide type de parametre");
+      }
     else
       yyerror("Type non pris en compte");
     break;
@@ -810,12 +883,12 @@ function_definition
     yyerror("Type booléen ou non défini ne peuvent pas etre le type de retour d'une fonction");
     //printf("Error\n");
   }
-
+  
   remove_param_hash_table($2);
   asprintf(&$$,"%s%s",$$, $3);  
-
+  
   asprintf(&$$,"%s}\n",$$);
-
+  
 
   
  }
@@ -842,6 +915,7 @@ int main (int argc, char *argv[]) {
 
   hash_array = calloc(max_hash, sizeof(GHashTable *));
   hash_array[level] = g_hash_table_new(g_str_hash, g_str_equal);
+  insert_declaration(hash_array[level]);
   int i = 1;
   for (; i < max_hash ; ++i)
     hash_array[i] = NULL;

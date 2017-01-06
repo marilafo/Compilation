@@ -13,9 +13,9 @@ define i32 @square(i32 %x_param){
 %x_param = alloca i32
 ret i32 %x3
 }
-define i32 @add(i32 %y_param, i32 %x_param){
+define i32 @add(i32 %y_param, i32 %v_param){
 %y_param = alloca i32
-%x_param = alloca i32
+%v_param = alloca i32
 ret i32 %x7
 }
 define i32 @main(){

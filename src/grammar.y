@@ -135,13 +135,13 @@ primary_expression
   //printf("Contenu hash table\n");
   //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
-  struct expression tmp = map_with_name(new_func($1));
+  struct expression *tmp = map_with_name(func_name($1));
   //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
   }    
-  $$->name = tmp->val;
+  $$->name = new_var();
   char *tmp_var = new_var();
   $$->t = tmp->t;
   if(call_function(tmp_var, tmp->val, "", tmp->t) != NULL){
@@ -158,57 +158,115 @@ primary_expression
   $$ = malloc(sizeof(struct generation));
   $$->code = NULL;
   //printf("mapping %s\n", new_func($1));
-  struct expression *tmp = map_with_name(new_func($1));
+  struct expression *tmp = map_with_name(func_name($1));
   
   //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
   }
-
-  struct expression *param;
-  int i = 0;
-  char *tmp_var;
-  char * l_param = NULL;
-  for (; i < tmp->size_param ; ++i){
-    param = look_for(tmp->param, i);
-    tmp_var = new_var();
-    switch (param->t){
-    case INTEGER:
-      
-      if ($$->code == NULL)
-	asprintf(&($$->code), "%s", load_value(tmp_var, param->val, INTEGER));
-      else
-	asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, param->val, INTEGER));
-      
-      if(l_param == NULL)
-	asprintf(&l_param,"i32 %s",tmp_var);
-      else
-	asprintf(&l_param,"%s, i32 %s", l_param, tmp_var);
-      
-      break;
-      
-    case FLOATING:
-      if($$->code == NULL)
-	asprintf(&($$->code), "%s", load_value(tmp_var, param->val, FLOATING));
-      else
-	asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, param->val, FLOATING));
-      
-      if(l_param == NULL)
-	asprintf(&l_param,"double %s",tmp_var);
-      else
-	asprintf(&l_param,"%s, double %s", l_param, tmp_var);
-      break;
-    default:
-      yyerror("Incompatible type de paramètre\n");
-    }
-  }
   
-  $$->name = tmp->val;
+  asprintf(&$3, "%s%c", $3, '\0');
+  // Récupération des paramètres 
+  int i=0;//,j,k;
+  char *tmp_var ;
+  char *l_param = NULL;
+  int l=strlen($3);
+  char *t = NULL;
+  char *name = NULL;
+  int type = 0;
+  t = NULL;
+  name = NULL;
+  $$->code = NULL;
+  enum type current;
+  for (i = 0; i < l ; ++i){ 
+    tmp_var = new_var();
+    if($3[i] == ','){
+      type = 0;
+      i++;
+      switch(current){
+      case INTEGER:
+	if ($$->code == NULL)
+	  asprintf(&($$->code), "%s", load_value(tmp_var, name, INTEGER));
+	else
+	asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, name, INTEGER));
+      
+	if(l_param == NULL)
+	  asprintf(&l_param,"i32 %s",tmp_var);
+	else
+	asprintf(&l_param,"%s, i32 %s", l_param, tmp_var);
+	break;
+      case FLOATING:
+	if($$->code == NULL)
+	  asprintf(&($$->code), "%s", load_value(tmp_var, name, FLOATING));
+	else
+	  asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, name, FLOATING));
+      
+	if(l_param == NULL)
+	  asprintf(&l_param,"double %s",tmp_var);
+	else
+	  asprintf(&l_param,"%s, double %s", l_param, tmp_var);
+	
+	break;
+      default:
+	printf("Eroor\n");
+      }
+      t = NULL;
+      name = NULL;
+    }
+    else if($3[i] == ' '){
+      type = 1;
+      if(strcmp(t,"i32") == 0)
+	current = INTEGER;
+      else if (strcmp (t, "double") == 0)
+	current = FLOATING;
+    }
+    else
+      if(type == 0){
+	if(t == NULL)
+	  asprintf(&t,"%c",$3[i]);
+	else
+	  asprintf(&t,"%s%c", t,$3[i]);
+      }
+      else{
+	if(name == NULL)
+	  asprintf(&name, "%c", $3[i]);
+	else
+	  asprintf(&name,"%s%c", name, $3[i]);
+      }
+    
+  }
+  switch(current){
+  case INTEGER:
+    if ($$->code == NULL)
+      asprintf(&($$->code), "%s", load_value(tmp_var, name, INTEGER));
+    else
+      asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, name, INTEGER));
+    
+    if(l_param == NULL)
+      asprintf(&l_param,"i32 %s",tmp_var);
+    else
+      asprintf(&l_param,"%s, i32 %s", l_param, tmp_var);
+    break;
+  case FLOATING:
+    if($$->code == NULL)
+      asprintf(&($$->code), "%s", load_value(tmp_var, name, FLOATING));
+    else
+      asprintf(&($$->code), "%s%s", $$->code, load_value(tmp_var, name, FLOATING));
+    
+    if(l_param == NULL)
+      asprintf(&l_param,"double %s",tmp_var);
+    else
+      asprintf(&l_param,"%s, double %s", l_param, tmp_var);
+    break;
+  default:
+    printf("Eroor\n");
+  }
+
+  //Fin récupération parametre 
+  $$->name = new_var();
   tmp_var = new_var();
   $$->t = tmp->t;
-  //printf("%d\n",$$->t);
-  //printf("%s\n", $$->name);
   
   if(call_function(tmp_var, tmp->val, l_param, tmp->t) != NULL){
     if($$->code != NULL)
@@ -256,6 +314,8 @@ argument_expression_list
     yyerror("Type non pris en compte");
   }
 ;
+
+
 //DOING
 unary_expression
 : postfix_expression{
@@ -449,6 +509,30 @@ declaration
   struct expression *tmp;
   for(; i<length_l; i++){
     tmp = look_for($2, i);
+    /*if(level == 0){
+      init_exp(tmp, new_global(tmp->name), string_to_type($1), level);
+      if(g_hash_table_contains(hash_array[level], tmp->name))
+	yyerror(&err, "Redéclaration de la variable %s", tmp->name);
+      else
+	g_hash_table_insert(hash_array[level], tmp->name, tmp);
+      switch(string_to_type($1)){
+	 case INTEGER:
+	if($$ != NULL)
+	  asprintf(&$$,"%s%s = common global\n", $$,tmp->val);
+	else
+	  asprintf(&$$,"%s = alloca i32\n",tmp->val);
+	break;
+      case FLOATING:
+	if ($$ != NULL)
+	  asprintf(&$$, "%s%s = alloca double\n",$$, tmp->val);
+	else
+	  asprintf(&$$, "%s = alloca double\n", tmp->val);
+	break;
+      default:
+	yyerror("Impossible de déclarer une variable qui n'est ni un double, ni un entier");
+      }
+    }
+    else{*/
     init_exp(tmp, new_var(tmp->name), string_to_type($1), level);
     if(g_hash_table_contains(hash_array[level], tmp->name))
       yyerror(&err, "Redéclaration de la variable %s", tmp->name);
@@ -469,6 +553,7 @@ declaration
       break;
     default:
       yyerror("Impossible de déclarer une variable qui n'est ni un double, ni un entier");
+      //    }
     }
   }
   
@@ -514,8 +599,8 @@ function_declarator
   $$ = $1;
   init_function($$, new_func($$->name), last_type, $3);
   struct expression *tmp;
-  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
-    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
+    g_hash_table_insert(hash_array[level], func_name($1->name), $$);
   //Sinon vérification de param
   int i = 0;
   for(; i < length_llist($3); ++i){
@@ -539,8 +624,8 @@ function_declarator
   $$ = $1;
   init_function($$, new_func($$->name), last_type, NULL);
   //printf("%s : %s %d", $$->name, $$->val, $$->t);
-  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
-    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
+    g_hash_table_insert(hash_array[level], func_name($1->name), $$);
   //Sinon vérification de param
   }
 ;
@@ -560,8 +645,8 @@ declarator
     $$ = $1;
     struct expression *tmp;
     init_function($$, new_func($$->name), last_type, $3);
-    if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
-      g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+    if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
+      g_hash_table_insert(hash_array[level], func_name($1->name), $$);
     //Sinon vérification de param
     int i = 0;
     for(; i < length_llist($3); ++i){
@@ -581,8 +666,8 @@ declarator
 | declarator '(' ')'{
   $$ = $1;
   init_function($$, new_func($$->name), last_type, NULL);
-  if(!g_hash_table_contains(hash_array[level], new_func($1->name)))
-    g_hash_table_insert(hash_array[level], new_func($1->name), $$);
+  if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
+    g_hash_table_insert(hash_array[level], func_name($1->name), $$);
   //Sinon vérification de param
   }
 ;
@@ -936,6 +1021,19 @@ int main (int argc, char *argv[]) {
     return 1;
   }
   yyparse ();
+
+  asprintf(&code, "declare double @cos(double)\n%s",code);
+  asprintf(&code, "declare double @sin(double)\n%s",code);
+  asprintf(&code, "declare double @log10(double)\n%s",code);
+  asprintf(&code, "declare double @sqrt(double)\n%s",code);
+  asprintf(&code, "declare void @point(double, double)\n%s",code);
+  asprintf(&code, "declare void @line(double, double, double, double)\n%s",code);
+  asprintf(&code, "declare void @ellipse(double, double, double, double)\n%s", code);
+  asprintf(&code, "declare void @fill(double)\n%s", code);
+  asprintf(&code, "declare void @stroke(double)\n%s", code);
+  asprintf(&code, "declare void @background(double)\n%s", code);
+  asprintf(&code, "declare void @createCanvas(double, double)\n%s",code);
+
   printf("%s\n", code);
   free (file_name);
 

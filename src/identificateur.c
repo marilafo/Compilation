@@ -109,17 +109,6 @@ void parcours(llist liste)
 }
 */
 
-void parcours_arguments(char *arguments){
-  int i=0,j,k;
-  int l=strlen(arguments);
-  
-  for(;i<l;i=k+1){
-    for(j=i;arguments[j] != ' ';j++)//type de la variable
-      printf("%c",arguments[j]);
-    for(k=j+1;arguments[k] != ',' && k < l;k++)//nom de la variable
-      printf("%c",arguments[k]);
-  }
-}
 
 void free_expression(struct expression *e){
   free(e);

@@ -4,13 +4,8 @@
 #include <glib.h>
 #include "identificateur.h"
 
-//Struct pour la génération de code
-struct generation{
-  char *code;
-  enum type t;
-  char *name;
-};
 
+//Permet de remplir yyerror!
 char *err;
   
 //Niveau pour les déclarations de variables
@@ -25,6 +20,22 @@ int num_label = 0;
 enum type last_type;
 
 int max_hash = 10;
+
+GHashTable ** hash_array;
+
+
+//Struct pour la génération de code
+struct generation{
+  char *code;
+  enum type t;
+  char *name;
+};
+
+struct exp_code{
+  struct expression *g;
+  char *code;
+};
+
 enum operation_code{
   ADD_OP = 0,
   SUB_OP = 1,
@@ -44,7 +55,7 @@ enum operation_code{
   NE_COMP = 15
 };
 
-GHashTable ** hash_array;
+
 
 
 //Function to create a new var with a correct name
@@ -106,13 +117,43 @@ void print_hash(gpointer key, gpointer value, gpointer user_data){
 }
   
 
+
+char *load_value(char *res, char* var, enum type t){
+  char *ret = NULL;
+  switch(t){
+  case INTEGER:
+    asprintf(&ret,"%s = load i32, i32* %s\n", res, var);
+    break;
+  case FLOATING:
+    asprintf(&ret,"%s = load double, double* %s \n", res, var);
+    break;
+  default:
+    return NULL;
+  }
+  return ret;
+}
+
+char *store_value(char *var, char* ptr, enum type t){
+  char *ret;
+  switch(t){
+  case INTEGER:
+    asprintf(&ret, "store i32 %s, i32* %s\n", var, ptr);
+    break;
+  case FLOATING:
+    asprintf(&ret, "store double %s, double* %s\n", var, ptr);
+    break;
+  default:
+    return NULL;
+  }
+  return ret;
+	    
+}
+
 struct expression *map_symbol(char *name, enum type t){
   struct expression *old;
   int i = level;
   for(; i > 0; --i){
-    //printf("Hash level %d:\n", i);
-    //g_hash_table_foreach(hash_array[i], print_hash, NULL);
-    //printf("\n");
+    
     if(i == 0){
       if (g_hash_table_contains(hash_array[i], new_param(name))){
 	old = g_hash_table_lookup(hash_array[i], new_param(name));
@@ -164,19 +205,52 @@ void value(gpointer key, gpointer value, gpointer user_data){
  
 }
 
-struct expression * action_identifier(char *name){
+struct exp_code action_identifier(char *name){
   struct expression *ret;
+  char *code = NULL;
+  char *tmp_var;
+  struct expression *old;
   if(g_hash_table_contains(hash_array[level], name)){
     ret = g_hash_table_lookup(hash_array[level], name);
     //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
   }
   else{
-    ret = map_with_name(name);
+    
+    int i = level;
+    for(; i >= 0; --i){
+      printf("Hash level %d:\n", i);
+      g_hash_table_foreach(hash_array[i], print_hash, NULL);
+      printf("\n");
+      if(i == 0){
+	if (g_hash_table_contains(hash_array[i], new_param(name))){
+	  printf("Coucou\n");
+	  old = g_hash_table_lookup(hash_array[i], new_param(name));
+	  ret= old;
+	  tmp_var = new_var();
+	  if(ret->t == INTEGER){
+	    asprintf(&code, "%s = alloca i32\n", tmp_var);
+	    printf("Hear\n");
+	  }
+	  else
+	    asprintf(&code, "%s = alloca double\n",tmp_var);
+	  asprintf(&code, "%s%s", code, store_value(ret->val, tmp_var, ret->t));
+	}
+      }
+      if( g_hash_table_contains(hash_array[i], name)){
+	old = g_hash_table_lookup(hash_array[i], name);
+	ret = old;
+	tmp_var = ret->val;
+      }
+    }
+
     //printf("%s :%s, %d\n", ret->val, ret->name, ret->t);
-    ret = create_exp(name, ret->val, ret->t, -1);
+    ret = create_exp(name, tmp_var, ret->t, -1);
     g_hash_table_insert(hash_array[level], name, ret);
   }
-  return ret;
+  struct exp_code d;
+  d.code = code;
+  d.g = ret;
+  return d;
 
 }
 
@@ -202,36 +276,6 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
 }
     
 
-char *load_value(char *res, char* var, enum type t){
-  char *ret = NULL;
-  switch(t){
-  case INTEGER:
-    asprintf(&ret,"%s = load i32, i32* %s\n", res, var);
-    break;
-  case FLOATING:
-    asprintf(&ret,"%s = load double, double* %s \n", res, var);
-    break;
-  default:
-    return NULL;
-  }
-  return ret;
-}
-
-char *store_value(char *var, char* ptr, enum type t){
-  char *ret;
-  switch(t){
-  case INTEGER:
-    asprintf(&ret, "store i32 %s, i32* %s\n", var, ptr);
-    break;
-  case FLOATING:
-    asprintf(&ret, "store double %s, double* %s\n", var, ptr);
-    break;
-  default:
-    return NULL;
-  }
-  return ret;
-	    
-}
 
 
 char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
@@ -374,12 +418,16 @@ char *made_comparison_double(char *res, char *arg1, char *arg2, enum operation_c
 
 struct generation *op_1(char *name, enum operation_code op ){
   struct generation *ret = malloc (sizeof(struct generation));
-  struct expression *tmp = action_identifier(name);
+  struct exp_code d = action_identifier(name);
+  struct expression *tmp = d.g;
   ret->name = tmp->val;
   ret->t = tmp->t;
   char *tmp_var = new_var();
   char *ret_var = new_var();
-  asprintf(&(ret->code),"%s", load_value(tmp_var, tmp->val, tmp->t));
+  if(d.code != NULL)
+    asprintf(&(ret->code),"%s%s", d.code,load_value(tmp_var, tmp->val, tmp->t));
+  else
+    asprintf(&(ret->code),"%s", load_value(tmp_var, tmp->val, tmp->t));
   switch(tmp->t){
   case INTEGER:
     if(made_op_int(ret_var, tmp_var, "1", op)==NULL)
@@ -543,17 +591,27 @@ char * for_expression(char *init, char *inc, struct generation *cond, char * b){
   return ret;
 }
 
-char *return_expression(enum type t, char* var){
+char *return_expression(enum type t, char* var, char *code){
   char *ret;
   switch(t){
   case INTEGER:
-    asprintf(&ret,"ret i32 %s\n", var);
+    if(code != NULL)
+      asprintf(&ret,"%sret i32 %s\n", code, var);
+    else
+      asprintf(&ret,"ret i32 %s\n", var);
     break;
   case FLOATING:
-    asprintf(&ret,"ret double %s\n", var);
+    if(code != NULL)
+      asprintf(&ret,"%sret double %s\n",code, var);
+    else
+      asprintf(&ret,"ret double %s\n", var);
     break;
   case VOID_T:
-    asprintf(&ret,"ret void");
+    if(code != NULL)
+      asprintf(&ret, "%sret void\n",code);
+    else
+      asprintf(&ret,"ret void\n");
+    break;
   default:
     return NULL;
   }

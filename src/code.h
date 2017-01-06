@@ -1,14 +1,42 @@
+#define CODE_H
+#ifndef CODE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <glib.h>
 #include "identificateur.h"
 
+
+//Permet de remplir yyerror!
+char *err;
+  
+//Niveau pour les déclarations de variables
+int level;
+
+//Compteurs variables temporaire
+int num_var = 0;
+
+//Compteurs de label
+int num_label = 0;
+
+enum type last_type;
+
+int max_hash = 10;
+
+GHashTable ** hash_array;
+
+
 //Struct pour la génération de code
 struct generation{
   char *code;
   enum type t;
   char *name;
+};
+
+struct exp_code{
+  struct expression *g;
+  char *code;
 };
 
 enum operation_code{
@@ -118,4 +146,6 @@ char * alloca_param(struct expression *fun);
 struct expression * double_param(char *name);
 
 //déclare les fonctions de dessin nécessaire pour créer une fractale
-void insert_declaration(struct GHashTable * hash);
+void insert_declaration(GHashTable * hash);
+
+#endif

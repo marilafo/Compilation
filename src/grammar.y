@@ -51,7 +51,6 @@
 conditional_expression
 : logical_or_expression{
   $$ = $1;
- 
  }
 ;
 
@@ -99,12 +98,15 @@ shift_expression
 //DOING
 primary_expression
 : IDENTIFIER {
-  //printf("%s\n",$1);
-  struct expression *tmp = action_identifier($1);
+  printf("%s\n",$1);
+  struct exp_code d = action_identifier($1);
+  struct expression *tmp = d.g;
+
   $$ = malloc(sizeof(struct generation));
   $$->name = tmp->val;
   $$->t = tmp->t;
-  $$->code = NULL;
+  $$->code = d.code;
+  printf("%s", d.code);
   //asprintf(&($$->code), "%s", $$->name);
   //printf("%s", $$->code);      
  }
@@ -873,14 +875,14 @@ iteration_statement
 //DOING
 jump_statement
 : RETURN ';'{
-  if(return_expression(VOID_T, NULL) != NULL)
-    $$ = return_expression(VOID_T, NULL);
+  if(return_expression(VOID_T, NULL, NULL) != NULL)
+    $$ = return_expression(VOID_T, NULL, NULL);
   else
     yyerror("Type non pris en compte");
  }
 | RETURN expression ';'{
-  if(return_expression($2->t, $2->name) != NULL)
-    $$ = return_expression($2->t, $2->name);
+  if(return_expression($2->t, $2->name, $2->code) != NULL)
+    $$ = return_expression($2->t, $2->name, $2->code);
   else
     yyerror("Type non pris en compte");
  }
@@ -913,7 +915,7 @@ function_definition
 : type_name function_declarator compound_statement{
   $2->t = string_to_type($1);
   $2->level = level;
-  char *p_alloc;
+  // char *p_alloc;
   switch($2->t){
     
   case INTEGER:
@@ -921,13 +923,13 @@ function_definition
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	p_alloc = alloca_param($2);
-	if(p_alloc != NULL){
+	//p_alloc = alloca_param($2);
+	//if(p_alloc != NULL){
 	  asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  asprintf(&$$,"%s%s",$$, p_alloc);
-	}
-	else
-	  yyerror("Invalide type de parametre");
+	  //asprintf(&$$,"%s%s",$$, p_alloc);
+	  //}
+	  //else
+	  // yyerror("Invalide type de parametre");
       }
     else
       yyerror("Type non pris en compte");
@@ -937,13 +939,13 @@ function_definition
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	p_alloc = alloca_param($2);
-	if(p_alloc != NULL){
+	//p_alloc = alloca_param($2);
+	//if(p_alloc != NULL){
 	  asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  asprintf(&$$,"%s%s", $$, p_alloc);
-	}
-	else
-	  yyerror("Invalide type de parametre");
+	  //asprintf(&$$,"%s%s", $$, p_alloc);
+	  //}
+	  //else
+	  //yyerror("Invalide type de parametre");
       }
     else
       yyerror("Type non pris en compte");
@@ -953,13 +955,13 @@ function_definition
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	p_alloc = alloca_param($2);
-	if(p_alloc != NULL){
+	//p_alloc = alloca_param($2);
+	//if(p_alloc != NULL){
 	  asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  asprintf(&$$,"%s%s",$$, p_alloc);
-	}
-	else
-	  yyerror("Invalide type de parametre");
+	  //asprintf(&$$,"%s%s",$$, p_alloc);
+	  //}
+	  //else
+	  //  yyerror("Invalide type de parametre");
       }
     else
       yyerror("Type non pris en compte");

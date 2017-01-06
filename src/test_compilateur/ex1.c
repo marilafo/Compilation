@@ -1,7 +1,7 @@
 int square(int x) {
   return x*x;
 }
-int add(int x,int y) {
+int add(int v,int y) {
   return x+y;
 }
 int main() {

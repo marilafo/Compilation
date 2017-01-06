@@ -129,12 +129,14 @@ void free_expression(struct expression *e){
 }
 
 void free_llist(struct llist *l){
-  int i=0;
+  struct element *tmp;
+  first=l->first;
   while(first->next != NULL){
     tmp = first->next;
     first->next=tmp->next;
     tmp->next=NULL;
     free_expression(tmp->val);
   }
+  first->next=NULL;
   free(first);
 }

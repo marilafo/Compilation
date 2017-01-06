@@ -9,13 +9,13 @@ declare double @sqrt(double)
 declare double @log10(double)
 declare double @sin(double)
 declare double @cos(double)
-%x_param = alloca i32
 define i32 @square(i32 %x_param){
+%x_param = alloca i32
 ret i32 %x3
 }
+define i32 @add(i32 %y_param, i32 %v_param){
 %y_param = alloca i32
-%x_param = alloca i32
-define i32 @add(i32 %y_param, i32 %x_param){
+%v_param = alloca i32
 ret i32 %x7
 }
 define i32 @main(){
@@ -50,7 +50,8 @@ store i32 %x23, i32* %x9
 store i32 %x16, i32* %x17
 %x18 = load i32, i32* %x9
 %x19 = load i32, i32* %x17
-%x20 = icmp slt i32 %x18, %x19%x21 = alloca i32
+%x20 = icmp slt i32 %x18, %x19
+%x21 = alloca i32
 store i32 %x20, i32* %x21
 br i1 %x21 label %l0, label %l1
 l1:

@@ -923,8 +923,8 @@ function_definition
       else{
 	p_alloc = alloca_param($2);
 	if(p_alloc != NULL){
-	  asprintf(&$$,"%s", p_alloc);
-	  asprintf(&$$,"%sdefine i32 %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"%s%s",$$, p_alloc);
 	}
 	else
 	  yyerror("Invalide type de parametre");
@@ -939,8 +939,8 @@ function_definition
       else{
 	p_alloc = alloca_param($2);
 	if(p_alloc != NULL){
-	  asprintf(&$$,"%s", p_alloc);
-	  asprintf(&$$,"%sdefine double %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"%s%s", $$, p_alloc);
 	}
 	else
 	  yyerror("Invalide type de parametre");
@@ -955,8 +955,8 @@ function_definition
       else{
 	p_alloc = alloca_param($2);
 	if(p_alloc != NULL){
-	  asprintf(&$$,"%s", p_alloc);
-	  asprintf(&$$,"%sdefine void %s(%s){\n", $$, new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
+	  asprintf(&$$,"%s%s",$$, p_alloc);
 	}
 	else
 	  yyerror("Invalide type de parametre");

@@ -66,7 +66,7 @@ char *new_func(char *function){
 
 char *new_param(char *name){
   char *s;
-  asprintf(&s,"%s_param", name);
+  asprintf(&s,"%%%s_param", name);
   return s;
 }
 
@@ -101,9 +101,9 @@ struct expression *map_symbol(char *name, enum type t){
   struct expression *old;
   int i = level;
   for(; i > 0; --i){
-    printf("Hash level %d:\n", i);
-    g_hash_table_foreach(hash_array[i], print_hash, NULL);
-    printf("\n");
+    //printf("Hash level %d:\n", i);
+    //g_hash_table_foreach(hash_array[i], print_hash, NULL);
+    //printf("\n");
     if(i == 0){
       if (g_hash_table_contains(hash_array[i], new_param(name))){
 	old = g_hash_table_lookup(hash_array[i], new_param(name));
@@ -123,9 +123,9 @@ struct expression *map_with_name(char *name){
  struct expression *old;
   int i = level;
   for(; i >= 0; --i){
-    printf("Hash level %d:\n", i);
-    g_hash_table_foreach(hash_array[i], print_hash, NULL);
-    printf("\n");
+    //printf("Hash level %d:\n", i);
+    //g_hash_table_foreach(hash_array[i], print_hash, NULL);
+    //printf("\n");
     if(i == 0){
       if (g_hash_table_contains(hash_array[i], new_param(name))){
 	old = g_hash_table_lookup(hash_array[i], new_param(name));
@@ -181,13 +181,14 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
   char *ret;
   switch(t){
   case INTEGER:
-    asprintf(&ret, "%s = call i32 @%s(%s)\n", var, fun, arg);
+    printf("Prout\n");
+    asprintf(&ret, "%s = call i32 %s(%s)\n", var, fun, arg);
     break;
   case FLOATING:
-    asprintf(&ret, "%s = call double @%s(%s)\n", var, fun, arg);
+    asprintf(&ret, "%s = call double %s(%s)\n", var, fun, arg);
     break;
   case VOID_T:
-    asprintf(&ret, "call void @%s(%s) noreturn\n", fun, arg);
+    asprintf(&ret, "call void %s(%s) noreturn\n", fun, arg);
     break;
   default:
     return NULL;
@@ -195,7 +196,7 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
   return ret;
 }
     
-/*
+
 char *load_value(char *res, char* var, enum type t){
   char *ret;
   switch(t){
@@ -210,9 +211,7 @@ char *load_value(char *res, char* var, enum type t){
   }
   return ret;
 }
-*/
 
-/*
 char *store_value(char *var, char* ptr, enum type t){
   char *ret;
   switch(t){
@@ -228,7 +227,7 @@ char *store_value(char *var, char* ptr, enum type t){
   return ret;
 	    
 }
-*/
+
 
 char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
   char *ret;
@@ -240,6 +239,7 @@ char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
     asprintf(&ret,"%s = sub i32 %s, %s\n", res, arg1, arg2);
     break;
   case MUL_OP:
+    //printf("multiplication\n");
     asprintf(&ret,"%s = mul i32 %s, %s\n", res, arg1, arg2);
     break;
   case DIV_OP:
@@ -407,34 +407,45 @@ struct generation *op_1(char *name, enum operation_code op ){
 struct generation *operation_expression(struct generation *a, struct generation *b, enum operation_code c, int made_code){
   struct generation *ret = malloc(sizeof(struct generation));
   ret->name = new_var();
-  //printf("Type a : %d\n", a->t);
+  //printf("Type a : %d\n", a->t); 
   //printf("Type b : %d\n", b->t);
   if(a->t == INTEGER && b->t == INTEGER){
     ret->t = a->t;
-    asprintf(&(ret->code), "%s%s", a->code, b->code);
+    /*if(load_value(a->name, a->name, a->t) == NULL)
+      printf("C'est nul\n");
+    else if(load_value(b->name, b->name, b->t) == NULL)
+    printf("C'est nul 2\n"); */
+    asprintf(&(ret->code), "%s%s%s%s", a->code, b->code, load_value(a->name, a->name, a->t), load_value(a->name, a->name, a->t));
     if (made_code == 0){
-      printf("Tout vas bien\n");
       if(made_op_int(ret->name, a->name, b->name ,c) == NULL)
 	return NULL;
-      else
+      else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(ret->name, a->name, b->name ,c));
+      }
     }
-    else if (made_code == 1)
-      if(made_comparison_int(ret->name, a->name, b->name ,c) != NULL)
+    else if (made_code == 1){
+      if(made_comparison_int(ret->name, a->name, b->name ,c) != NULL){
 	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(ret->name, a->name, b->name ,c));
-    return NULL;
+      }
+      else
+	return NULL;
+    }
   }
   else if (a->t == FLOATING && b->t == FLOATING){
     ret->t = a->t;
-    asprintf(&(ret->code), "%s%s", a->code, b->code);
+    asprintf(&(ret->code), "%s%s%s%s", a->code, b->code, load_value(a->name, a->name, a->t), load_value(a->name, a->name, a->t));
     if(made_code == 0)
       if(made_op_double(ret->name, a->name, b->name, c) == NULL)
 	return NULL;
-      else
+      else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(ret->name, a->name, b->name, c));
+	return ret;
+      }
     else if (made_code == 1){
-      if(made_comparison_double(ret->name, a->name, b->name, c) != NULL)
+      if(made_comparison_double(ret->name, a->name, b->name, c) != NULL){
 	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(ret->name, a->name, b->name, c));
+	return ret;
+      }
       else 
 	return NULL;
     }
@@ -534,19 +545,43 @@ enum type string_to_type(char *s){
 
 char *parameter_to_string(struct expression *e){
   int i = 0;
-  char *ret;
+  char *ret = NULL;
   struct expression *param;
+  if(e->size_param > i){
+    param = look_for(e->param, i);
+    switch(param->t){
+    case INTEGER:
+      asprintf(&ret,"i32 %s", param->val);
+      break;
+    case FLOATING:
+      asprintf(&ret,"double %s", param->val);
+      break;
+    default:
+      return NULL;
+    }
+  }
+  i = 1;
   for(; i < e->size_param; i++){
     param = look_for(e->param, i);
     switch(param->t){
     case INTEGER:
-      asprintf(&ret,", i32 %s",param->name);
+      asprintf(&ret,"%s, i32 %s",ret, param->val);
       break;
     case FLOATING:
-      asprintf(&ret,", double %s",param->name); 
+      asprintf(&ret,"%s, double %s",ret, param->val);
+      break;
     default:
       return NULL;
     }    
   }
   return ret;
+}
+
+void remove_param_hash_table(struct expression *e){
+  int i = 0;
+  struct expression *param;
+  for (; i < e->size_param ; i++){
+    param = look_for(e->param, i);
+    g_hash_table_remove(hash_array[level],param->name);
+  }
 }

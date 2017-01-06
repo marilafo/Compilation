@@ -7,7 +7,7 @@ LIBS=$(shell pkg-config --libs glib-2.0)
 all:parse
 
 parse:grammar.c scanner.c identificateur.c
-	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	$(CC) $(CFLAGS) -g -o $@ $^ $(LIBS)
 
 grammar.c:grammar.y
 	$(YACC) -Wconflicts-sr -t -d -o $@ --defines=grammar.tab.h $^

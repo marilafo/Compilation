@@ -214,18 +214,14 @@ struct exp_code action_identifier(char *name){
     
     int i = level;
     for(; i >= 0; --i){
-      printf("Hash level %d:\n", i);
       g_hash_table_foreach(hash_array[i], print_hash, NULL);
-      printf("\n");
       if(i == 0){
 	if (g_hash_table_contains(hash_array[i], new_param(name))){
-	  printf("Coucou\n");
 	  old = g_hash_table_lookup(hash_array[i], new_param(name));
 	  ret= old;
 	  tmp_var = new_var();
 	  if(ret->t == INTEGER){
 	    asprintf(&code, "%s = alloca i32\n", tmp_var);
-	    printf("Hear\n");
 	  }
 	  else
 	    asprintf(&code, "%s = alloca double\n",tmp_var);

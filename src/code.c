@@ -173,9 +173,6 @@ struct expression *map_with_name(char *name){
  struct expression *old;
   int i = level;
   for(; i >= 0; --i){
-    //printf("Hash level %d:\n", i);
-    //g_hash_table_foreach(hash_array[i], print_hash, NULL);
-    //printf("\n");
     if(i == 0){
       if (g_hash_table_contains(hash_array[i], new_param(name))){
 	old = g_hash_table_lookup(hash_array[i], new_param(name));
@@ -212,7 +209,6 @@ struct exp_code action_identifier(char *name){
   struct expression *old;
   if(g_hash_table_contains(hash_array[level], name)){
     ret = g_hash_table_lookup(hash_array[level], name);
-    //asprintf(&($$->code),"%s", load_value($$->name, tmp->val, tmp->t));	      
   }
   else{
     
@@ -243,7 +239,6 @@ struct exp_code action_identifier(char *name){
       }
     }
 
-    //printf("%s :%s, %d\n", ret->val, ret->name, ret->t);
     ret = create_exp(name, tmp_var, ret->t, -1);
     g_hash_table_insert(hash_array[level], name, ret);
   }
@@ -288,7 +283,6 @@ char *made_op_int(char *res, char *arg1, char *arg2, enum operation_code op){
     asprintf(&ret,"%s = sub i32 %s, %s\n", res, arg1, arg2);
     break;
   case MUL_OP:
-    //printf("multiplication\n");
     asprintf(&ret,"%s = mul i32 %s, %s\n", res, arg1, arg2);
     break;
   case DIV_OP:
@@ -340,18 +334,6 @@ char *made_op_double(char *res, char *arg1, char *arg2, enum operation_code op){
   case ASS_OP:
     asprintf(&ret,NULL);
     break;
-    /*case SHL_OP:
-    printf("Error on ne peut pas SHL avec un double\n");
-    break;
-  case SHR_OP:
-    printf("Error on ne peut pas SHR avec un double\n");
-    break;
-  case AND_OP:
-    printf("Error on ne peut pas AND avec un double\n");
-    break;
-  case OR_OP:
-    printf("Error on ne peut pas OR avec un double\n");
-    break;*/
   default:
     return NULL;
 
@@ -443,15 +425,12 @@ struct generation *op_1(char *name, enum operation_code op ){
         
     break;
   case VOID_T:
-    //printf("++/-- invalide avec type void\n");
     return NULL;
     break;
   case BOOL_T:
-    //printf("++/-- invalide avec type booleen\n");
     return NULL;
     break;
   case NOT_DEFINE:
-    //printf("++/-- invalide variable non défini\n");
     return NULL;
     break;
   }
@@ -480,14 +459,8 @@ struct generation *operation_expression(struct generation *a, struct generation 
   char *var_b = new_var();
   char *var_res = new_var();
   ret->name = new_var();
-  //printf("Type a : %d\n", a->t); 
-  //printf("Type b : %d\n", b->t);
   if(a->t == INTEGER && b->t == INTEGER){
     ret->t = a->t;
-    /*if(load_value(a->name, a->name, a->t) == NULL)
-      printf("C'est nul\n");
-    else if(load_value(b->name, b->name, b->t) == NULL)
-    printf("C'est nul 2\n"); */
     
     insert_previous_exp(ret, a, b);
 

@@ -6,9 +6,6 @@
 #include "code.c"
   
   
-  //A enlever quand on aura les listes
-  //int tab = 0;
-  //int p = 0;
 
   char *code;
   
@@ -47,58 +44,66 @@
   struct generation *gen;
 }
 %%
- //DONE
+ 
 conditional_expression
 : logical_or_expression{
   $$ = $1;
  }
 ;
 
-//DONE
+ 
 logical_or_expression
 : logical_and_expression{
   $$ = $1;
  }
 | logical_or_expression OR logical_and_expression{
   $$ = operation_expression($1, $3, OR_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
 ;
 
-//DONE
+ 
 logical_and_expression
 : comparison_expression{
   $$ = $1;
  }
 | logical_and_expression AND comparison_expression{
   $$ = operation_expression($1, $3, AND_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
+
 ;
 
-//DONE
+ 
 shift_expression
 : additive_expression{
   $$ = $1;
  }
 | shift_expression SHL additive_expression{
   $$ = operation_expression($1, $3, SHL_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1; 
+  }
  }
 | shift_expression SHR additive_expression{
   $$ = operation_expression($1, $3, SHR_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  } 
  }
 ;
 
-//DOING
+ 
 primary_expression
 : IDENTIFIER {
-  printf("%s\n",$1);
   struct exp_code d = action_identifier($1);
   struct expression *tmp = d.g;
 
@@ -106,9 +111,6 @@ primary_expression
   $$->name = tmp->val;
   $$->t = tmp->t;
   $$->code = d.code;
-  printf("%s", d.code);
-  //asprintf(&($$->code), "%s", $$->name);
-  //printf("%s", $$->code);      
  }
 | CONSTANTI  {
   $$ = malloc(sizeof(struct generation));
@@ -118,7 +120,6 @@ primary_expression
   asprintf(&($$->code),"%s = add i32 0, %d\n", var_tmp, $1);
   asprintf(&($$->code),"%s%s = alloca i32\n", $$->code, $$->name);
   asprintf(&($$->code),"%s%s", $$->code, store_value(var_tmp, $$->name, INTEGER));
-  //printf("%s: %d\n", $$->name, $$->t); 
   }
 | CONSTANTF  {
   $$ = malloc(sizeof(struct generation));
@@ -133,15 +134,12 @@ primary_expression
   $$ = $2;
   }
 | IDENTIFIER '(' ')' {
-  //printf("%s\n",$1);
-  //printf("Contenu hash table\n");
-  //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
   struct expression *tmp = map_with_name(func_name($1));
-  //faire la vérif de type
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
+    return -1;
   }    
   $$->name = new_var();
   char *tmp_var = new_var();
@@ -150,27 +148,27 @@ primary_expression
     asprintf(&($$->code), "%s",call_function(tmp_var, tmp->val, "", tmp->t));
     asprintf(&($$->code), "%s%s", $$->code, store_value(tmp_var, $$->name, tmp->t));
   }
-  else 
+  else{ 
     yyerror("Type non pris en compte");
+    return -1;
+  }
   }
 | IDENTIFIER '(' argument_expression_list ')'{
-  //printf("%s\n", $1);
-  //printf("Contenu hash table\n");
-  //g_hash_table_foreach(hash_array[0], print_hash, NULL);
   $$ = malloc(sizeof(struct generation));
   $$->code = NULL;
-  //printf("mapping %s\n", new_func($1));
+  
   struct expression *tmp = map_with_name(func_name($1));
   
-  //faire la vérif de type
+  
   if(tmp == NULL){
     asprintf(&err, "Error: %s function not define", $1);
     yyerror(err);
+    return -1;
   }
   
   asprintf(&$3, "%s%c", $3, '\0');
   // Récupération des paramètres 
-  int i=0;//,j,k;
+  int i=0;
   char *tmp_var ;
   char *l_param = NULL;
   int l=strlen($3);
@@ -211,7 +209,8 @@ primary_expression
 	
 	break;
       default:
-	printf("Eroor\n");
+	yyerror("Error\n");
+	return -1;
       }
       t = NULL;
       name = NULL;
@@ -262,7 +261,8 @@ primary_expression
       asprintf(&l_param,"%s, double %s", l_param, tmp_var);
     break;
   default:
-    printf("Eroor\n");
+    yyerror("Error\n");
+    return -1;
   }
 
   //Fin récupération parametre 
@@ -277,67 +277,75 @@ primary_expression
       asprintf(&($$->code), "%s",call_function(tmp_var, tmp->val, l_param, tmp->t));
     asprintf(&($$->code), "%s%s", $$->code, store_value(tmp_var, $$->name, $$->t));
   }
-  else
+  else{
     yyerror("Type non pris en compte");
+    return -1;
+  }
   }
 ;
 
-//DOING
+ 
 postfix_expression
 : primary_expression {
   $$ = $1;
  }
 | IDENTIFIER INC_OP {
-  //printf("%s\n", $1);
+  
   $$ = op_1($1,ADD_OP);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
 | IDENTIFIER DEC_OP{
-  //printf("%s\n", $1);
+  
   $$ = op_1($1,SUB_OP);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
- }
+    return -1;
+  }
+  }
 ;
 
-//DOING
+ 
 argument_expression_list
 : expression{
   if(get_type($1->name, $1->t)!=NULL)
     asprintf(&$$,"%s",get_type($1->name, $1->t));
-  else
+  else{
     yyerror("Type non pris en compte");
- }
+    return -1;
+  }
+  }
 | argument_expression_list ',' expression{
   if(get_type($3->name, $3->t)!=NULL)
     asprintf(&$$,"%s, %s",$1, get_type($3->name, $3->t));
-  else 
+  else{ 
     yyerror("Type non pris en compte");
+    return -1;
+  }
   }
 ;
 
 
-//DOING
+ 
 unary_expression
 : postfix_expression{
-  //printf("tets2\n");
-  //printf("Hash level %d:\n", level);
-  //g_hash_table_foreach(hash_array[level], print_hash, NULL);
-  //printf("\n");
   $$ = $1;
  }
 | INC_OP IDENTIFIER {
-  //printf("%s\n",$2);
   $$ = op_1($2, ADD_OP);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
 | DEC_OP IDENTIFIER{
-  //printf("%s\n",$2);
   $$ = op_1($2, SUB_OP);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
 | unary_operator unary_expression{
   $$ = $2;
@@ -370,113 +378,139 @@ unary_expression
     break;
   default:
     yyerror("Impossible de rendre négatif, type incompatible");
+    return -1;
   }
  }
 ;
 
-//DONE
+ 
 unary_operator
 : '-'
 ;
 
-//DOING
+ 
 multiplicative_expression
 : unary_expression{
   $$ = $1;
  }
 | multiplicative_expression '*' unary_expression {
   $$ = operation_expression($1, $3, MUL_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles test");
+    return -1;
+  }
   }
 | multiplicative_expression '/' unary_expression{
   $$ = operation_expression($1, $3, DIV_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }  
   }
 | multiplicative_expression REM unary_expression{
   $$ = operation_expression($1, $3, REM_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
  }
 ;
 
-//DOING
+ 
 additive_expression
 : multiplicative_expression{
   $$ = $1;
  }
 | additive_expression '+' multiplicative_expression{
   $$ = operation_expression($1, $3, ADD_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
   }
 | additive_expression '-' multiplicative_expression{
   $$ = operation_expression($1, $3, SUB_OP, 0);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }  
   }
 ;
 
-//DOING
+ 
 comparison_expression
 : shift_expression{
   $$ = $1;
  }
 | comparison_expression '<' shift_expression{
   $$ = operation_expression($1, $3, L_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }
   }
 | comparison_expression '>' shift_expression{
   $$ = operation_expression($1, $3, G_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles");
+    return -1;
+  }  
   }
 | comparison_expression LE_OP shift_expression{
   $$ = operation_expression($1, $3, LE_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
+    return -1;
+  } 
  }
 | comparison_expression GE_OP shift_expression{
   $$ = operation_expression($1, $3, GE_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
+    return -1;
+  }
  }
 | comparison_expression EQ_OP shift_expression{
   $$ = operation_expression($1, $3, EQ_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
+    return -1;
+  }
  }
 | comparison_expression NE_OP shift_expression{
   $$ = operation_expression($1, $3, NE_COMP, 1);
-  if($$ == NULL)
+  if($$ == NULL){
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
+    return -1;
+  } 
  }
 ;
 
-//DOING
+ 
 expression
 : unary_expression assignment_operator conditional_expression{
   $$ = operation_expression($1, $3, string_to_op_code($2), 0);
   if($$ != NULL){
     if(store_value($3->name, $1->name, $$->t) != NULL)
       asprintf(&($$->code), "%s%s",$$->code,store_value($3->name, $1->name, $$->t));
-    else
+    else{
       yyerror("Erreur de type : stockage impossible");
+      return -1;
+    }
   }
-  else
+  else{
     yyerror("Operation non prise en compte, Type et operation non compatibles"); 
+    return -1;
+  }
  }
 | conditional_expression{
   $$ = $1;
   }
 ;
 
-//DONE
+ 
 assignment_operator
 : '='{
-  //printf("ok\n");
   $$ = "ass";
  }
 | MUL_ASSIGN{
@@ -502,7 +536,7 @@ assignment_operator
   }
 ;
 
-//DOING
+ 
 declaration
 : type_name declarator_list ';'{
   int length_l = length_llist($2);
@@ -511,33 +545,11 @@ declaration
   struct expression *tmp;
   for(; i<length_l; i++){
     tmp = look_for($2, i);
-    /*if(level == 0){
-      init_exp(tmp, new_global(tmp->name), string_to_type($1), level);
-      if(g_hash_table_contains(hash_array[level], tmp->name))
-	yyerror(&err, "Redéclaration de la variable %s", tmp->name);
-      else
-	g_hash_table_insert(hash_array[level], tmp->name, tmp);
-      switch(string_to_type($1)){
-	 case INTEGER:
-	if($$ != NULL)
-	  asprintf(&$$,"%s%s = common global\n", $$,tmp->val);
-	else
-	  asprintf(&$$,"%s = alloca i32\n",tmp->val);
-	break;
-      case FLOATING:
-	if ($$ != NULL)
-	  asprintf(&$$, "%s%s = alloca double\n",$$, tmp->val);
-	else
-	  asprintf(&$$, "%s = alloca double\n", tmp->val);
-	break;
-      default:
-	yyerror("Impossible de déclarer une variable qui n'est ni un double, ni un entier");
-      }
-    }
-    else{*/
     init_exp(tmp, new_var(tmp->name), string_to_type($1), level);
-    if(g_hash_table_contains(hash_array[level], tmp->name))
+    if(g_hash_table_contains(hash_array[level], tmp->name)){
       yyerror(&err, "Redéclaration de la variable %s", tmp->name);
+      return -1;
+    }
     else
       g_hash_table_insert(hash_array[level], tmp->name, tmp);
     switch(string_to_type($1)){
@@ -555,29 +567,27 @@ declaration
       break;
     default:
       yyerror("Impossible de déclarer une variable qui n'est ni un double, ni un entier");
-      //    }
+      return -1;
     }
   }
   
  }
 ;
 
-//DOING
-//METTRE LES LISTES 
+ 
+
 declarator_list
-//: declarator_init
 : declarator{
   $$ = init_llist();
   add_llist($$, $1);
  }
-//| declarator_list ',' declarator_init
 | declarator_list ',' declarator{
   $$ = $1;
   add_llist($$, $3);
   }
 ;
 
-//DONE
+ 
 type_name
 : VOID{
   $$ = "void";
@@ -593,7 +603,7 @@ type_name
   }
 ;
 
-//DOING
+ 
 //GESTION TABLE DE HASH
 //GENERATION CODE
 function_declarator
@@ -603,7 +613,7 @@ function_declarator
   struct expression *tmp;
   if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
     g_hash_table_insert(hash_array[level], func_name($1->name), $$);
-  //Sinon vérification de param
+  
   int i = 0;
   for(; i < length_llist($3); ++i){
     tmp = look_for($3, i);
@@ -611,6 +621,7 @@ function_declarator
       if(nb_occ($3, tmp->name) != 1){
 	asprintf(&err, "Error: param %s already initialize\n", tmp->name);
 	yyerror(err);
+	return -1;
       }
       if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
 	g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
@@ -618,26 +629,23 @@ function_declarator
     else{
       asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
       yyerror(err);
+      return -1;
     }
   }
  }
 | declarator '(' ')'{
-  //printf("Coucou TOYO\n");
   $$ = $1;
   init_function($$, new_func($$->name), last_type, NULL);
-  //printf("%s : %s %d", $$->name, $$->val, $$->t);
   if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
     g_hash_table_insert(hash_array[level], func_name($1->name), $$);
-  //Sinon vérification de param
   }
 ;
 
-//DOING
+ 
 //GESTION TABLE HASH
 //GENERATION CODE
 declarator
 : IDENTIFIER {
-  //printf("%s\n",$1);
   $$ = create_non_init_exp($1);
  }
 | '(' declarator ')'{
@@ -649,20 +657,23 @@ declarator
     init_function($$, new_func($$->name), last_type, $3);
     if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
       g_hash_table_insert(hash_array[level], func_name($1->name), $$);
-    //Sinon vérification de param
     int i = 0;
     for(; i < length_llist($3); ++i){
       tmp = look_for($3, i);
       if(tmp->t != VOID_T){
-	if(nb_occ($3, tmp->name) != 1)
+	if(nb_occ($3, tmp->name) != 1){
 	  asprintf(&err, "Error: param %s already initialize\n", tmp->name);
-	yyerror(err);
+	  yyerror(err);
+	  return -1;
+	}
 	if(!g_hash_table_contains(hash_array[level],new_param(tmp->name)))
 	  g_hash_table_insert(hash_array[level], new_param(tmp->name),tmp);
       }
-      else
+      else{
 	asprintf(&err,"Error:impossible to have void parameter :%s", tmp->name);
-      yyerror(err);
+	yyerror(err);
+	return -1;
+      }
     }
   }
 | declarator '(' ')'{
@@ -670,25 +681,12 @@ declarator
   init_function($$, new_func($$->name), last_type, NULL);
   if(!g_hash_table_contains(hash_array[level], func_name($1->name)))
     g_hash_table_insert(hash_array[level], func_name($1->name), $$);
-  //Sinon vérification de param
   }
 ;
   
-/*declarator_init
-  : declarator{
-  $$ = $1;
-  }
-  | IDENTIFIER '=' expression{
-  switch($3->t){
-  case INTEGER:
-  $$ = create_int($3
-  case FLOATING:
-  default:
-  printf("Error\n");
-  }
-  ;*/
 
-//DOING
+
+ 
 parameter_list
 : parameter_declaration{
   $$ = init_llist();
@@ -700,16 +698,15 @@ parameter_list
   }
 ;
 
-//DOING
+ 
 parameter_declaration
 : type_name declarator{
   $$ = $2;
   init_exp($$, new_param($$->name), string_to_type($1), level);
-  //printf("Dec : %s, %d, %s\n", $2->val, $2->t, $2->name);
  }
 ;
 
-//DOING
+ 
 statement
 : compound_statement{
   $$ = $1;
@@ -728,7 +725,7 @@ statement
   }
 ;
 
-//DOING
+ 
 LB : '{'{
   level++;
   if(level >= max_hash){
@@ -745,14 +742,14 @@ LB : '{'{
  }
 ;
 
-//DOING
+ 
 RB : '}'{
   g_hash_table_foreach(hash_array[level], value, NULL);
   level--;
  }
 ;
 
-//DOING
+ 
 compound_statement
 : LB RB{
   $$ = NULL;
@@ -765,18 +762,17 @@ compound_statement
  }
 ;
 
-//DOING
+ 
 compound_stat
 : statement_list {
   $$ = $1;
-  //printf("Test : %s", $$);
  }
 | statement_list compound_dec{
   asprintf(&$$,"%s%s", $1, $2);
  }
 ;
 
-//DOING
+ 
 compound_dec
 : declaration_list{
   if($1 != NULL)
@@ -790,14 +786,13 @@ compound_dec
  }
 ;
 
-//DOING
+ 
 declaration_list
 : declaration {
   if ($1 != NULL)
     $$ = $1;
  }
 | declaration_list declaration{
-  printf("dec : %s", $2);
   if($2 != NULL)
     asprintf(&$$,"%s%s", $1, $2);
   else
@@ -806,7 +801,7 @@ declaration_list
  }
 ;
 
-//DOING
+ 
 statement_list
 : statement{
   $$ = $1;
@@ -816,7 +811,7 @@ statement_list
  }
 ;
 
-//DOING
+ 
 expression_statement
 : ';'
 {
@@ -827,7 +822,7 @@ expression_statement
   }
 ;
 
-//DOING
+ 
 selection_statement
 : IF '(' expression ')' statement{
   $$ = if_expression($3->name, $3->code, $5, NULL);
@@ -836,7 +831,6 @@ selection_statement
   $$ = if_expression($3->name, $3->code, $5, $7);
   }
 | FOR '(' expression ';' expression ';' expression ')' statement{
-  //printf("Coucou2\n");
   $$ = for_expression($3->code, $7->code, $5, $9);
   }
 | FOR '(' expression ';' expression ';'            ')' statement{
@@ -862,7 +856,7 @@ selection_statement
   }
 ;
 
-//DOING
+ 
 iteration_statement
 : WHILE '(' expression ')' statement{
   $$ = for_expression(NULL, $3->code, NULL, $5);
@@ -872,23 +866,27 @@ iteration_statement
  }
 ;
 
-//DOING
+ 
 jump_statement
 : RETURN ';'{
   if(return_expression(VOID_T, NULL, NULL) != NULL)
     $$ = return_expression(VOID_T, NULL, NULL);
-  else
+  else{
     yyerror("Type non pris en compte");
+    return -1;
+  }
  }
 | RETURN expression ';'{
   if(return_expression($2->t, $2->name, $2->code) != NULL)
     $$ = return_expression($2->t, $2->name, $2->code);
-  else
+  else{
     yyerror("Type non pris en compte");
+    return -1;
+  }
  }
 ;
 
-//DOING
+ 
 program
 : external_declaration{
   $$ = $1;
@@ -900,7 +898,7 @@ program
  }
 ;
 
-//DOING
+ 
 external_declaration
 : function_definition{
   $$ = $1;
@@ -910,12 +908,11 @@ external_declaration
   }
 ;
 
-//TODO
+ 
 function_definition
 : type_name function_declarator compound_statement{
   $2->t = string_to_type($1);
   $2->level = level;
-  // char *p_alloc;
   switch($2->t){
     
   case INTEGER:
@@ -923,52 +920,41 @@ function_definition
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	//p_alloc = alloca_param($2);
-	//if(p_alloc != NULL){
-	  asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  //asprintf(&$$,"%s%s",$$, p_alloc);
-	  //}
-	  //else
-	  // yyerror("Invalide type de parametre");
+	asprintf(&$$,"define i32 %s(%s){\n", new_func($2->name), parameter_to_string($2));
+	
       }
-    else
+    else{
       yyerror("Type non pris en compte");
+      return -1;
+    }
     break;
   case FLOATING:
     if(parameter_to_string($2) != NULL || $2->param == NULL)
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	//p_alloc = alloca_param($2);
-	//if(p_alloc != NULL){
-	  asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  //asprintf(&$$,"%s%s", $$, p_alloc);
-	  //}
-	  //else
-	  //yyerror("Invalide type de parametre");
+	asprintf(&$$,"define double %s(%s){\n", new_func($2->name), parameter_to_string($2));
       }
-    else
+    else{
       yyerror("Type non pris en compte");
+      return -1;
+    }
     break;
   case VOID_T:
     if(parameter_to_string($2) != NULL || $2->param == NULL )
       if ($2->param == NULL)
 	asprintf(&$$,"define i32 %s(){\n", new_func($2->name));
       else{
-	//p_alloc = alloca_param($2);
-	//if(p_alloc != NULL){
-	  asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
-	  //asprintf(&$$,"%s%s",$$, p_alloc);
-	  //}
-	  //else
-	  //  yyerror("Invalide type de parametre");
+	asprintf(&$$,"define void %s(%s){\n", new_func($2->name), parameter_to_string($2));
       }
-    else
+    else{
       yyerror("Type non pris en compte");
-    break;
+      return -1;
+    }
+      break;
   default:
     yyerror("Type booléen ou non défini ne peuvent pas etre le type de retour d'une fonction");
-    //printf("Error\n");
+    return -1;
   }
   
   remove_param_hash_table($2);
@@ -1036,7 +1022,7 @@ int main (int argc, char *argv[]) {
   asprintf(&code, "declare void @background(double)\n%s", code);
   asprintf(&code, "declare void @createCanvas(double, double)\n%s",code);
 
-  printf("%s\n", code);
+  
   free (file_name);
 
   i = 0;

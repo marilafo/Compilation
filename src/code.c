@@ -55,15 +55,27 @@ char *new_var(){
   return s;
 }
 
+char *func_name(char *function){
+  char *s;
+  asprintf(&s, "%s_func", function);
+  return s;
+}
+
 char *new_func(char *function){
   char *s;
-  asprintf(&s, "@%s_func", function);
+  asprintf(&s, "@%s", function);
   return s;
 }
 
 char *new_param(char *name){
   char *s;
   asprintf(&s,"%%%s_param", name);
+  return s;
+}
+
+char *new_global(char *name){
+  char *s;
+  asprintf(&s, "@%s", name);
   return s;
 }
 
@@ -191,7 +203,7 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
     
 
 char *load_value(char *res, char* var, enum type t){
-  char *ret;
+  char *ret = NULL;
   switch(t){
   case INTEGER:
     asprintf(&ret,"%s = load i32, i32* %s\n", res, var);
@@ -307,22 +319,22 @@ char *made_comparison_int(char *res, char *arg1, char *arg2, enum operation_code
   char *ret;
   switch(comp){
   case L_COMP:
-    asprintf(&ret,"%s = icmp slt i32 %s, %s", res, arg1, arg2); 
+    asprintf(&ret,"%s = icmp slt i32 %s, %s\n", res, arg1, arg2); 
     break;
   case G_COMP:
-    asprintf(&ret,"%s = icmp sgt i32 %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = icmp sgt i32 %s, %s\n", res, arg1, arg2);
     break;
   case LE_COMP:
-    asprintf(&ret,"%s = icmp sle i32 %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = icmp sle i32 %s, %s\n", res, arg1, arg2);
     break;
   case GE_COMP:
-    asprintf(&ret,"%s = icmp sge i32 %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = icmp sge i32 %s, %s\n", res, arg1, arg2);
     break;
   case EQ_COMP:
-    asprintf(&ret,"%s = icmp eq i32 %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = icmp eq i32 %s, %s\n", res, arg1, arg2);
     break;
   case NE_COMP:
-    asprintf(&ret,"%s = icmp ne i32 %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = icmp ne i32 %s, %s\n", res, arg1, arg2);
     break;
   default:
     return NULL;
@@ -334,22 +346,22 @@ char *made_comparison_double(char *res, char *arg1, char *arg2, enum operation_c
   char *ret;
   switch(comp){
   case L_COMP:
-    asprintf(&ret,"%s = fcmp ult double %s, %s", res, arg1, arg2); 
+    asprintf(&ret,"%s = fcmp ult double %s, %s\n", res, arg1, arg2); 
     break;
   case G_COMP:
-    asprintf(&ret,"%s = fcmp ugt double %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = fcmp ugt double %s, %s\n", res, arg1, arg2);
     break;
   case LE_COMP:
-    asprintf(&ret,"%s = fcmp ule double %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = fcmp ule double %s, %s\n", res, arg1, arg2);
     break;
   case GE_COMP:
-    asprintf(&ret,"%s = fcmp uge double %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = fcmp uge double %s, %s\n", res, arg1, arg2);
     break;
   case EQ_COMP:
-    asprintf(&ret,"%s = fcmp ueq double %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = fcmp ueq double %s, %s\n", res, arg1, arg2);
     break;
   case NE_COMP:
-    asprintf(&ret,"%s = fcmp une double %s, %s", res, arg1, arg2);
+    asprintf(&ret,"%s = fcmp une double %s, %s\n", res, arg1, arg2);
     break;
   default:
     return NULL;
@@ -441,14 +453,14 @@ struct generation *operation_expression(struct generation *a, struct generation 
 	return NULL;
       else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(var_res, var_a, var_b, c));
-	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s = alloca i32\n", ret->code, ret->name);
 	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER));
       }
     }
     else if (made_code == 1){
       if(made_comparison_int(var_res, var_a, var_b ,c) != NULL){
 	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(var_res, var_a, var_b ,c));
-	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s = alloca i32\n", ret->code, ret->name);
 	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER));
       }
       else
@@ -469,14 +481,14 @@ struct generation *operation_expression(struct generation *a, struct generation 
 	return NULL;
       else{
 	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(var_res, var_a, var_b, c));
-	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s = alloca double\n", ret->code, ret->name);
 	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING));
 	return ret;
       }
     else if (made_code == 1){
       if(made_comparison_double(var_res, var_a, var_b, c) != NULL){
 	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(var_res, var_a, var_b, c));
-	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s = alloca double\n", ret->code, ret->name);
 	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING));
 	return ret;
       }
@@ -651,36 +663,48 @@ char * alloca_param(struct expression *fun){
   return ret;
 }
 
-void insert_declaration(struct GHashTable * hash){
-  struct expression *createCanvas = create_non_init_exp(new_func("createCanvas"));
+struct expression * double_param(char *name){
+  struct expression * d = create_exp(name, new_param(name), FLOATING, 0);
+  return d;
+}
+
+void insert_declaration(GHashTable * hash){
+  struct expression *createCanvas = create_non_init_exp("createCanvas");
   struct llist *param = init_llist();
   add_llist(param, double_param("a"));
   add_llist(param, double_param("b"));
-  init_function(createCanvas, "@createCanvas", VOID_T, param);
+  init_function(createCanvas,new_func("createCanvas"), VOID_T, param);
 
+  g_hash_table_insert(hash, func_name(createCanvas->name), createCanvas);
 
-  struct expression *background = create_non_init_exp(new_func("createCanvas"));
+  struct expression *background = create_non_init_exp(new_func("background"));
   param = init_llist();
   add_llist(param, double_param("a"));
-  init_function(background, "@background", VOID_T, param);
+  init_function(background, new_func("background"), VOID_T, param);
 
+  g_hash_table_insert(hash, func_name(background->name), background);
   
   struct expression *fill = create_non_init_exp(new_func("fill"));
   param = init_llist();
   add_llist(param, double_param("a"));
-  init_function(fill, "@fill", VOID_T, param);
+  init_function(fill, new_func("fill"), VOID_T, param);
 
+  g_hash_table_insert(hash, func_name(fill->name), fill);
    
   struct expression *stroke = create_non_init_exp(new_func("stroke"));
   param = init_llist();
   add_llist(param, double_param("a"));
-  init_function(stroke, "@stroke", VOID_T, param);
+  init_function(stroke, new_func("stroke"), VOID_T, param);
+
+  g_hash_table_insert(hash, func_name(stroke->name), stroke);
 
   struct expression *point = create_non_init_exp(new_func("point"));
   param = init_llist();
   add_llist(param, double_param("a"));
   add_llist(param, double_param("b"));
-  init_function(point, "@point", VOID_T, param);
+  init_function(point, new_func("point"), VOID_T, param);
+
+  g_hash_table_insert(hash, func_name(point->name), point);
   
   struct expression *line = create_non_init_exp(new_func("line"));
   param = init_llist();
@@ -688,7 +712,9 @@ void insert_declaration(struct GHashTable * hash){
   add_llist(param, double_param("b"));
   add_llist(param, double_param("c"));
   add_llist(param, double_param("d"));
-  init_function(line, "@line", VOID_T, param);
+  init_function(line, new_func("line"), VOID_T, param);
+
+  g_hash_table_insert(hash, func_name(line->name), line);
 
   struct expression *ellipse = create_non_init_exp(new_func("ellipse"));
   param = init_llist();
@@ -696,15 +722,38 @@ void insert_declaration(struct GHashTable * hash){
   add_llist(param, double_param("b"));
   add_llist(param, double_param("c"));
   add_llist(param, double_param("d"));
-  init_function(ellipse, "@ellipse", VOID_T, param);
+  init_function(ellipse, new_func("ellipse"), VOID_T, param);
 
+  g_hash_table_insert(hash, func_name(ellipse->name), ellipse);
+
+    
+  struct expression *sin = create_non_init_exp(new_func("sin"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(sin, new_func("sin"), FLOATING, param);
+
+  g_hash_table_insert(hash, new_func(sin->name), sin);
+
+  struct expression *cos = create_non_init_exp(new_func("cos"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(cos, new_func("cos"), FLOATING, param);
+
+  g_hash_table_insert(hash, new_func(cos->name), cos);
   
+  struct expression *log10 = create_non_init_exp(new_func("log10"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(log10, new_func("log10"), FLOATING, param);
+
+  g_hash_table_insert(hash, new_func(log10->name), log10);
+
+  struct expression *sqrt = create_non_init_exp(new_func("sqrt"));
+  param = init_llist();
+  add_llist(param, double_param("a"));
+  init_function(sqrt, new_func("sqrt"), FLOATING, param);
+
+  g_hash_table_insert(hash, new_func(sqrt->name), sqrt);
   
-
-
 }
 
-struct expression * double_param(char *name){
-  struct expression * d = create_exp(name, new_param(name), FLOATING, 0);
-  return d;
-}

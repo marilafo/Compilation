@@ -1022,6 +1022,16 @@ int main (int argc, char *argv[]) {
   asprintf(&code, "declare void @background(double)\n%s", code);
   asprintf(&code, "declare void @createCanvas(double, double)\n%s",code);
 
+
+  FILE *output = NULL;
+  output=fopen("convert.ll","w");
+
+  if(output != NULL)
+    fputs(code,output);
+  else{
+    yyerror("Erreur creation fichier");
+    return -1;
+  }
   
   free (file_name);
 

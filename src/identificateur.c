@@ -17,7 +17,7 @@ void init_exp(struct expression *e, char *val, enum type t, int level){
   e->t = t;
   e->val = val;
   e->param = NULL;
-  e-> size_param = -1;
+  e->size_param = -1;
   e->level = level;
 }
 

@@ -214,7 +214,7 @@ struct exp_code action_identifier(char *name){
     
     int i = level;
     for(; i >= 0; --i){
-      g_hash_table_foreach(hash_array[i], print_hash, NULL);
+      //g_hash_table_foreach(hash_array[i], print_hash, NULL);
       if(i == 0){
 	if (g_hash_table_contains(hash_array[i], new_param(name))){
 	  old = g_hash_table_lookup(hash_array[i], new_param(name));

@@ -7,6 +7,6 @@ int add(int x,int y) {
 int main() {
   int i,x;
   for (i=0; i<1000; i++)
-    x = add(j,x);
+    x = add(i,x);
   return x;
 }

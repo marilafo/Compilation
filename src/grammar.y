@@ -106,20 +106,26 @@ primary_expression
   $$->t = tmp->t;
   $$->code = NULL;
   //asprintf(&($$->code), "%s", $$->name);
-  //printf("%s", $$->name);      
+  //printf("%s", $$->code);      
  }
 | CONSTANTI  {
   $$ = malloc(sizeof(struct generation));
+  char *var_tmp = new_var();
   $$->name = new_var();
   $$->t = INTEGER;
-  asprintf(&($$->code),"%s = add i32 0, %d\n", $$->name, $1);
+  asprintf(&($$->code),"%s = add i32 0, %d\n", var_tmp, $1);
+  asprintf(&($$->code),"%s%s = alloca i32\n", $$->code, $$->name);
+  asprintf(&($$->code),"%s%s", $$->code, store_value(var_tmp, $$->name, INTEGER));
   //printf("%s: %d\n", $$->name, $$->t); 
   }
 | CONSTANTF  {
   $$ = malloc(sizeof(struct generation));
+  char *var_tmp = new_var();
   $$->name = new_var();
   $$->t = FLOATING;
-  asprintf(&($$->code),"%s = fadd double %s, %s\n", $$->name, double_to_hex_str(0.0), double_to_hex_str($1));
+  asprintf(&($$->code),"%s = fadd double %s, %s\n", var_tmp, double_to_hex_str(0.0), double_to_hex_str($1));
+  asprintf(&($$->code),"%s%s = alloca double\n", $$->code, $$->name);
+  asprintf(&($$->code),"%s%s", $$->code, store_value(var_tmp, $$->name, FLOATING));
   }
 | '(' expression ')'{
   $$ = $2;
@@ -157,13 +163,13 @@ primary_expression
     
   $$->name = tmp->val;
   $$->t = tmp->t;
-  printf("%d\n",$$->t);
-  printf("%s\n", $$->name);
+  //printf("%d\n",$$->t);
+  //printf("%s\n", $$->name);
   
-  if(call_function(new_func($$->name), tmp->val, $3, tmp->t)==NULL)
-    asprintf(&($$->code), "%s", call_function(new_func($$->name), tmp->val, $3, tmp->t));
+  if(call_function($$->name, tmp->val, $3, tmp->t) != NULL)
+    asprintf(&($$->code), "%s", call_function($$->name, tmp->val, $3, tmp->t));
   else
-    yyerror("Type non pris en compte  toto");
+    yyerror("Type non pris en compte");
   }
 ;
 
@@ -223,15 +229,33 @@ unary_expression
     yyerror("Operation non prise en compte, Type et operation non compatibles");
  }
 | unary_operator unary_expression{
-  $$ = malloc(sizeof(struct generation));
-  $$->name = new_var();
-  $$->t = $2->t;
+  $$ = $2;
+  char *tmp_var1 = new_var();  
+  char *tmp_var2 = new_var();
   switch($$->t){
   case INTEGER :
-    asprintf(&($$->code),"%s%s = sub i32 0, %s\n",$2->code, $$->name, $2->name);
+    if($2->code == NULL){
+      asprintf(&($$->code),"%s", load_value(tmp_var1, $2->name, INTEGER));
+      asprintf(&($$->code),"%s%s = sub i32 0, %s\n", $$->code, tmp_var2, tmp_var1);
+      asprintf(&($$->code),"%s%s", $$->code, store_value(tmp_var2, $2->name, INTEGER));
+    }
+    else{
+      asprintf(&($$->code),"%s%s", $2->code, load_value(tmp_var1, $2->name, INTEGER));
+      asprintf(&($$->code),"%s%s = sub i32 0, %s\n", $$->code, tmp_var2, tmp_var1);
+      asprintf(&($$->code),"%s%s", $$->code, store_value(tmp_var2, $2->name, INTEGER));
+    }
     break;
   case FLOATING:
-    asprintf(&($$->code),"%s%s = fsub double %s, %s\n",$2->code, $$->name, double_to_hex_str(0.0), $2->name);
+    if ($2->code == NULL){
+      asprintf(&($$->code),"%s", load_value(tmp_var1, $2->name, FLOATING));
+      asprintf(&($$->code),"%s%s = fsub double %s, %s\n",$$->code, tmp_var2, double_to_hex_str(0.0), tmp_var1);
+      asprintf(&($$->code),"%s%s", $$->code, store_value(tmp_var2, $2->name, INTEGER));
+    }
+    else{
+      asprintf(&($$->code),"%s%s", $2->code, load_value(tmp_var1, $2->name, FLOATING));
+      asprintf(&($$->code),"%s%s = fsub double %s, %s\n",$$->code, tmp_var2, double_to_hex_str(0.0), tmp_var1);
+      asprintf(&($$->code),"%s%s", $$->code, store_value(tmp_var2, $2->name, INTEGER));
+    }
     break;
   default:
     yyerror("Impossible de rendre négatif, type incompatible");
@@ -371,7 +395,7 @@ assignment_operator
 declaration
 : type_name declarator_list ';'{
   int length_l = length_llist($2);
-  
+  $$ = NULL;
   int i = 0;
   struct expression *tmp;
   for(; i<length_l; i++){
@@ -381,6 +405,22 @@ declaration
       yyerror(&err, "Redéclaration de la variable %s", tmp->name);
     else
       g_hash_table_insert(hash_array[level], tmp->name, tmp);
+    switch(string_to_type($1)){
+    case INTEGER:
+      if($$ != NULL)
+	asprintf(&$$,"%s%s = alloca i32\n", $$,tmp->val);
+      else
+	asprintf(&$$,"%s = alloca i32\n",tmp->val);
+      break;
+    case FLOATING:
+      if ($$ != NULL)
+	asprintf(&$$, "%s%s = alloca double\n",$$, tmp->val);
+      else
+	asprintf(&$$, "%s = alloca double\n", tmp->val);
+      break;
+    default:
+      yyerror("Impossible de déclarer une variable qui n'est ni un double, ni un entier");
+    }
   }
   
  }
@@ -592,6 +632,7 @@ compound_statement
 compound_stat
 : statement_list {
   $$ = $1;
+  //printf("Test : %s", $$);
  }
 | statement_list compound_dec{
   asprintf(&$$,"%s%s", $1, $2);
@@ -601,18 +642,30 @@ compound_stat
 //DOING
 compound_dec
 : declaration_list{
-  $$ = $1;
+  if($1 != NULL)
+    $$ = $1;
  }
 | declaration_list compound_stat{
-  asprintf(&$$, "%s%s", $1, $2);
+  if($1 != NULL)
+    asprintf(&$$, "%s%s", $1, $2);
+  else
+    asprintf(&$$, "%s", $2);
  }
 ;
 
 //DOING
 declaration_list
-: declaration
+: declaration {
+  if ($1 != NULL)
+    $$ = $1;
+ }
 | declaration_list declaration{
-  asprintf(&$$,"%s", $1);
+  printf("dec : %s", $2);
+  if($2 != NULL)
+    asprintf(&$$,"%s%s", $1, $2);
+  else
+    if($1 != NULL)
+      asprintf(&$$,"%s", $1);
  }
 ;
 
@@ -715,7 +768,9 @@ external_declaration
 : function_definition{
   $$ = $1;
  }
-| declaration
+| declaration{
+  $$ = $1;
+  }
 ;
 
 //TODO
@@ -757,8 +812,8 @@ function_definition
   }
 
   remove_param_hash_table($2);
- 
   asprintf(&$$,"%s%s",$$, $3);  
+
   asprintf(&$$,"%s}\n",$$);
 
 

@@ -165,12 +165,7 @@ struct expression * action_identifier(char *name){
   else{
     ret = map_with_name(name);
     //printf("%s :%s, %d\n", ret->val, ret->name, ret->t);
-    if(ret==NULL){
-      t = last_type;
-    }
-    else
-      t = ret->t;
-    ret = create_exp(name, new_var(), t, -1);
+    ret = create_exp(name, ret->val, ret->t, -1);
     g_hash_table_insert(hash_array[level], name, ret);
   }
   return ret;
@@ -181,14 +176,16 @@ char *call_function(char *var, char *fun, char *arg ,enum type t){
   char *ret;
   switch(t){
   case INTEGER:
-    printf("Prout\n");
     asprintf(&ret, "%s = call i32 %s(%s)\n", var, fun, arg);
+    return ret;
     break;
   case FLOATING:
     asprintf(&ret, "%s = call double %s(%s)\n", var, fun, arg);
+    return ret;
     break;
   case VOID_T:
     asprintf(&ret, "call void %s(%s) noreturn\n", fun, arg);
+    return ret;
     break;
   default:
     return NULL;
@@ -404,8 +401,23 @@ struct generation *op_1(char *name, enum operation_code op ){
   return ret;
 }
 
+void insert_previous_exp(struct generation *ret, struct generation *a, struct generation *b){
+   if(a->code != NULL){
+      asprintf(&(ret->code),"%s", a->code);
+      if(b->code != NULL)
+	asprintf(&(ret->code),"%s%s", ret->code, b->code);
+    }
+    else
+      if(b->code != NULL)
+	asprintf(&(ret->code),"%s", b->code);
+}
+
 struct generation *operation_expression(struct generation *a, struct generation *b, enum operation_code c, int made_code){
   struct generation *ret = malloc(sizeof(struct generation));
+  ret->code = NULL;
+  char *var_a;
+  char *var_b;
+  char *var_res;
   ret->name = new_var();
   //printf("Type a : %d\n", a->t); 
   //printf("Type b : %d\n", b->t);
@@ -415,17 +427,27 @@ struct generation *operation_expression(struct generation *a, struct generation 
       printf("C'est nul\n");
     else if(load_value(b->name, b->name, b->t) == NULL)
     printf("C'est nul 2\n"); */
-    asprintf(&(ret->code), "%s%s%s%s", a->code, b->code, load_value(a->name, a->name, a->t), load_value(a->name, a->name, a->t));
+    
+    insert_previous_exp(ret, a, b);
+
+    if(ret->code == NULL)
+      asprintf(&(ret->code), "%s%s", load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
+    else
+      asprintf(&(ret->code), "%s%s%s", ret->code, load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
     if (made_code == 0){
-      if(made_op_int(ret->name, a->name, b->name ,c) == NULL)
+      if(made_op_int(var_res, var_a, var_b, c) == NULL)
 	return NULL;
       else{
-	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(ret->name, a->name, b->name ,c));
+	asprintf(&(ret->code), "%s%s",ret->code, made_op_int(var_res, var_a, var_b, c));
+	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER);
       }
     }
     else if (made_code == 1){
-      if(made_comparison_int(ret->name, a->name, b->name ,c) != NULL){
-	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(ret->name, a->name, b->name ,c));
+      if(made_comparison_int(var_res, var_a, var_b ,c) != NULL){
+	asprintf(&(ret->code), "%s%s", ret->code, made_comparison_int(var_res, var_a, var_b ,c));
+	asprintf(&(ret->code), "%s%s = alloca i32", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, INTEGER);
       }
       else
 	return NULL;
@@ -433,17 +455,27 @@ struct generation *operation_expression(struct generation *a, struct generation 
   }
   else if (a->t == FLOATING && b->t == FLOATING){
     ret->t = a->t;
-    asprintf(&(ret->code), "%s%s%s%s", a->code, b->code, load_value(a->name, a->name, a->t), load_value(a->name, a->name, a->t));
+    
+     insert_previous_exp(ret, a, b);
+
+    if(ret->code == NULL)
+      asprintf(&(ret->code), "%s%s",load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
+    else
+      asprintf(&(ret->code), "%s%s%s", ret->code, load_value(var_a, a->name, a->t), load_value(var_b, b->name, b->t));
     if(made_code == 0)
-      if(made_op_double(ret->name, a->name, b->name, c) == NULL)
+      if(made_op_double(var_res, var_a, var_b, c) == NULL)
 	return NULL;
       else{
-	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(ret->name, a->name, b->name, c));
+	asprintf(&(ret->code), "%s%s",ret->code, made_op_double(var_res, var_a, var_b, c));
+	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING)
 	return ret;
       }
     else if (made_code == 1){
-      if(made_comparison_double(ret->name, a->name, b->name, c) != NULL){
-	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(ret->name, a->name, b->name, c));
+      if(made_comparison_double(var_ret, var_a, var_b, c) != NULL){
+	asprintf(&(ret->code), "%s%s",ret->code, made_comparison_double(var_ret, var_a, var_b, c));
+	asprintf(&(ret->code), "%s%s = alloca double", ret->code, ret->name);
+	asprintf(&(ret->code), "%s%s", ret->code, store_value(var_res, ret->name, FLOATING)
 	return ret;
       }
       else 
